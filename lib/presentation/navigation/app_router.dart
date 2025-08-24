@@ -2,10 +2,15 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:footlog/presentation/navigation/route_names.dart';
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:get_it/get_it.dart';
+import 'package:footlog/presentation/pages/matches/add_match_page.dart';
+import 'package:footlog/presentation/cubit/matches/add_match/add_match_cubit.dart';
+import 'package:footlog/domain/matches/usecases/add_match_usecase.dart';
 
 // pages
 import '../pages/auth/login_page.dart';
@@ -81,5 +86,16 @@ final appRouter = GoRouter(
         );
       },
     ),
+    GoRoute(
+      path: RouteNames.matchesAdd,
+      builder: (context, __) {
+        final uid = _auth.currentUser?.uid ?? 'mock-uid';
+        return BlocProvider(
+          create: (_) => AddMatchCubit(uid: uid, addMatch: GetIt.I<AddMatchUseCase>()),
+          child: const AddMatchPage(),
+        );
+      },
+    ),
   ],
 );
+

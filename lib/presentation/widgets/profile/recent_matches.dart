@@ -1,12 +1,13 @@
-// presentation/widgets/profile/recent_matches.dart
+// lib/presentation/widgets/profile/recent_matches.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/app_theme.dart';
-import '../../../domain/home/entities/recent_match.dart';
+// важно: импортируем модель из domain
+import '../../../domain/home/entities/recent_match.dart' as model;
 import '../../../domain/home/enums/outcome.dart';
 
 class RecentMatchesCard extends StatelessWidget {
-  final List<RecentMatch> list;
+  final List<model.RecentMatch> list;
   final bool showTitle;
 
   const RecentMatchesCard({
@@ -22,7 +23,7 @@ class RecentMatchesCard extends StatelessWidget {
   }
 
   String _status(Outcome o) => switch (o) {
-    Outcome.win => 'Победа',
+    Outcome.win  => 'Победа',
     Outcome.loss => 'Поражение',
     Outcome.draw => 'Ничья',
   };
@@ -32,18 +33,6 @@ class RecentMatchesCard extends StatelessWidget {
     Outcome.loss => AppStatusColors.danger,
     Outcome.draw => AppColors.textGray,
   };
-
-  (int, int) _scorePair(String? score) {
-    if (score != null) {
-      final parts = score.split(':');
-      if (parts.length == 2) {
-        final a = int.tryParse(parts[0].trim());
-        final b = int.tryParse(parts[1].trim());
-        if (a != null && b != null) return (a, b);
-      }
-    }
-    return (4, 3);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,64 +45,54 @@ class RecentMatchesCard extends StatelessWidget {
             Center(
               child: Text(
                 'Последние матчи',
-                // Явный стиль — чтобы не «съедался» темой
                 style: TextStyle(
-                  fontSize: 17.sp,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.black,
+                  fontSize: 17.sp, fontWeight: FontWeight.w700, color: AppColors.black,
                 ),
               ),
             ),
             SizedBox(height: 12.h),
           ],
-          ...list.map((m) => _item(context, m)).toList(),
+          if (list.isEmpty)
+            Center(
+              child: Text('Пока нет матчей', style: TextStyle(fontSize: 14.sp, color: AppColors.textGray)),
+            )
+          else
+            ...list.map((m) => _item(context, m)).toList(),
         ],
       ),
     );
   }
 
-  Widget _item(BuildContext context, RecentMatch m) {
-    final (home, away) = _scorePair(m.score);
+  Widget _item(BuildContext context, model.RecentMatch m) {
+    final yourName = m.yourTeam.isEmpty ? 'Ваша команда' : m.yourTeam;
+    final oppName  = m.opponentTeam.isEmpty ? 'Соперник' : m.opponentTeam;
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 6.h),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          // Дата — узкая колонка
           SizedBox(
             width: 66.w,
-            child: Text(
-              _date(m.date),
-              style: TextStyle(fontSize: 12.sp, color: AppColors.textGray),
-            ),
+            child: Text(_date(m.date), style: TextStyle(fontSize: 12.sp, color: AppColors.textGray)),
           ),
-
-          // Блок из двух строк
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _teamLine('Название', home, dim: false),
+                _teamLine(title: yourName, score: m.yourGoals, dim: false, logoUrl: null),
                 SizedBox(height: 4.h),
-                _teamLine('Название', away, dim: true),
+                _teamLine(title: oppName, score: m.opponentGoals, dim: true, logoUrl: m.opponentLogoUrl),
               ],
             ),
           ),
-
-          // Статус — фиксированная ширина
           SizedBox(
             width: 92.w,
             child: Center(
               child: Text(
                 _status(m.outcome),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w600,
-                  color: _statusColor(m.outcome),
-                ),
+                maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: _statusColor(m.outcome)),
               ),
             ),
           ),
@@ -122,44 +101,37 @@ class RecentMatchesCard extends StatelessWidget {
     );
   }
 
-  Widget _teamLine(String title, int score, {required bool dim}) {
+  Widget _teamLine({
+    required String title,
+    required int score,
+    required bool dim,
+    String? logoUrl,
+  }) {
     final color = dim ? const Color(0x663C3C43) : AppColors.black;
-    final textStyle = TextStyle(
-      fontSize: 15.sp,
-      fontWeight: FontWeight.w600,
-      color: color,
-      height: 1.0,
-    );
+    final textStyle = TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w600, color: color, height: 1.0);
 
     return Row(
       children: [
-        Container(
-          width: 10.w,
-          height: 10.w,
-          decoration: const BoxDecoration(
-            color: Color(0xFFBDBDBD),
-            shape: BoxShape.circle,
-          ),
-        ),
+        _avatar(logoUrl),
         SizedBox(width: 8.w),
-        Expanded(
-          child: Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: textStyle,
-          ),
-        ),
+        Expanded(child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: textStyle)),
         SizedBox(width: 6.w),
-        SizedBox(
-          width: 20.w,
-          child: Text(
-            '$score',
-            textAlign: TextAlign.right,
-            style: textStyle,
-          ),
-        ),
+        SizedBox(width: 20.w, child: Text('$score', textAlign: TextAlign.right, style: textStyle)),
       ],
+    );
+  }
+
+  Widget _avatar(String? url) {
+    final s = 14.w;
+    if (url == null || url.isEmpty) {
+      return Container(width: s, height: s, decoration: const BoxDecoration(color: Color(0xFFBDBDBD), shape: BoxShape.circle));
+    }
+    return ClipOval(
+      child: Image.network(
+        url,
+        width: s, height: s, fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Container(width: s, height: s, decoration: const BoxDecoration(color: Color(0xFFBDBDBD), shape: BoxShape.circle)),
+      ),
     );
   }
 }
