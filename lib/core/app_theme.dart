@@ -1,27 +1,26 @@
-// lib/core/ui/app_theme.dart
+// lib/core/app_theme.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-/// ======= Colors (из Figma) =======
 class AppColors {
   AppColors._();
-  static const Color primary     = Color(0xFF34C759); // зелёная кнопка
-  static const Color primaryAlt  = Color(0xFF34A853); // запасной зелёный
+  static const Color labelGray30 = Color(0x4D3C3C43); // 30% от #3C3C43
+  static const Color primary     = Color(0xFF34C759);
+  static const Color primaryAlt  = Color(0xFF34A853);
   static const Color textGray    = Color(0xFF6C757D);
   static const Color black       = Color(0xFF000000);
   static const Color white       = Color(0xFFFFFFFF);
 
   static const Color fieldBg     = white;
-  static const Color fieldBorder = Color(0x14000000); // прозрачный чёрный (8%)
-  static const Color divider     = Color(0x1F000000); // 12%
-  static const Color shadow      = Color(0x33000000); // 20%
-  static const Color labelGray = Color(0xFF3C3C43);
+  static const Color fieldBorder = Color(0x14000000);
+  static const Color divider     = Color(0x1F000000);
+  static const Color shadow      = Color(0x33000000);
+  static const Color labelGray   = Color(0xFF3C3C43);
+  static const Color labelGray60 = Color(0x993C3C43);
 
-  /// тонкая рамка карточек (панелей) как в макете
   static const Color panelBorder = Color(0xFFE5E7EB);
 }
 
-/// ======= Radii / Spacing =======
 class AppDims {
   AppDims._();
   static double r12() => 12.r;
@@ -30,7 +29,6 @@ class AppDims {
   static double h52() => 52.h;
 }
 
-/// ======= TextStyles (через ScreenUtil) =======
 class AppText {
   AppText._();
   static TextStyle h1 = TextStyle(
@@ -47,16 +45,15 @@ class AppText {
   );
 }
 
-/// ======= ThemeData =======
 ThemeData buildAppTheme() {
   final base = ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
-    scaffoldBackgroundColor: const Color(0xFFF7F8FA), // фон экрана как в макете
+    scaffoldBackgroundColor: const Color(0xFFF7F8FA),
+    fontFamily: 'SF Pro Text', // можно убрать, если не подключал шрифт
   );
 
   return base.copyWith(
-    // Текстовые стили ближе к макету
     textTheme: base.textTheme
         .apply(bodyColor: AppColors.black, displayColor: AppColors.black)
         .copyWith(
@@ -66,29 +63,27 @@ ThemeData buildAppTheme() {
       labelMedium: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600),
     ),
 
-    // Белые карточки без M3 overlay
     cardTheme: const CardThemeData(
       color: AppColors.white,
       surfaceTintColor: Colors.transparent,
       elevation: 0,
     ),
 
-    // Нижняя навигация: зелёная активная иконка, подпись 13sp
     navigationBarTheme: NavigationBarThemeData(
       height: 64,
       elevation: 0,
       backgroundColor: AppColors.white,
       surfaceTintColor: Colors.transparent,
-      indicatorColor: Colors.transparent, // без «пилюли»
-      iconTheme: MaterialStateProperty.resolveWith((states) {
-        final selected = states.contains(MaterialState.selected);
+      indicatorColor: Colors.transparent,
+      iconTheme: WidgetStateProperty.resolveWith((states) {
+        final selected = states.contains(WidgetState.selected);
         return IconThemeData(
           size: 24,
           color: selected ? AppColors.primary : const Color(0xFF6B7280),
         );
       }),
-      labelTextStyle: MaterialStateProperty.resolveWith((states) {
-        final selected = states.contains(MaterialState.selected);
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        final selected = states.contains(WidgetState.selected);
         return TextStyle(
           fontSize: 13.sp,
           fontWeight: FontWeight.w600,
@@ -97,7 +92,6 @@ ThemeData buildAppTheme() {
       }),
     ),
 
-    // Переключатели периода (1/6/12 месяцев)
     segmentedButtonTheme: SegmentedButtonThemeData(
       style: ButtonStyle(
         padding: WidgetStateProperty.all(
@@ -127,7 +121,6 @@ ThemeData buildAppTheme() {
       ),
     ),
 
-    // Низкий и аккуратный шит
     bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: AppColors.white,
       surfaceTintColor: Colors.transparent,
@@ -136,18 +129,17 @@ ThemeData buildAppTheme() {
       ),
     ),
 
-    // Поля ввода
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.fieldBg,
       contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppDims.r12()),
-        borderSide: BorderSide(color: AppColors.fieldBorder),
+        borderSide: const BorderSide(color: AppColors.fieldBorder),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppDims.r12()),
-        borderSide: BorderSide(color: AppColors.fieldBorder),
+        borderSide: const BorderSide(color: AppColors.fieldBorder),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppDims.r12()),
@@ -156,7 +148,6 @@ ThemeData buildAppTheme() {
       hintStyle: TextStyle(color: AppColors.textGray, fontSize: 15.sp),
     ),
 
-    // Кнопки
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
@@ -169,6 +160,7 @@ ThemeData buildAppTheme() {
         elevation: 0,
       ),
     ),
+
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         minimumSize: Size(double.infinity, AppDims.h52()),
@@ -183,12 +175,12 @@ ThemeData buildAppTheme() {
       ),
     ),
 
-    // Разделители и AppBar
     dividerTheme: DividerThemeData(
       color: AppColors.divider,
       thickness: 1,
       space: 24.h,
     ),
+
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -198,7 +190,7 @@ ThemeData buildAppTheme() {
   );
 }
 
-/// Статусные цвета (победа/поражение)
+/// Статусные цвета
 class AppStatusColors {
   static const success = Color(0xFF22C55E);
   static const danger  = Color(0xFFEF4444);
@@ -208,11 +200,7 @@ class AppStatusColors {
 class AppCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
-  const AppCard({
-    super.key,
-    required this.child,
-    this.padding = const EdgeInsets.all(16),
-  });
+  const AppCard({super.key, required this.child, this.padding = const EdgeInsets.all(16)});
 
   @override
   Widget build(BuildContext context) {
@@ -222,7 +210,7 @@ class AppCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDims.r16()),
         boxShadow: const [
           BoxShadow(
-            color: AppColors.shadow, // 20% чёрный
+            color: AppColors.shadow,
             blurRadius: 12,
             offset: Offset(0, 3),
           ),
@@ -233,15 +221,11 @@ class AppCard extends StatelessWidget {
   }
 }
 
-/// Белая панель с тонкой серой рамкой (без тени) — для шапки и списка матчей
+/// Белая панель с тонкой серой рамкой (без тени)
 class AppPanel extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
-  const AppPanel({
-    super.key,
-    required this.child,
-    this.padding = const EdgeInsets.all(16),
-  });
+  const AppPanel({super.key, required this.child, this.padding = const EdgeInsets.all(16)});
 
   @override
   Widget build(BuildContext context) {
