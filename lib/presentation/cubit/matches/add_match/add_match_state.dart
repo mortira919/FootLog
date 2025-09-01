@@ -22,6 +22,10 @@ class AddMatchState with _$AddMatchState {
     String? opponentLogoUrl,
     String? yourLogoUrl,
 
+    // флаги загрузки логотипов
+    @Default(false) bool isUploadingYourLogo,
+    @Default(false) bool isUploadingOpponentLogo,
+
     // позицию В МАТЧЕ убрали
     @Default(FieldType.natural) FieldType fieldType,
     @Default(Weather.sunny) Weather weather,

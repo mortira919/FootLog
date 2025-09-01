@@ -5,7 +5,6 @@ import 'package:footlog/di/di.dart';
 import 'package:footlog/core/my_result.dart';
 
 import 'package:footlog/domain/home/enums/outcome.dart';
-
 import 'package:footlog/domain/matches/entities/match_item.dart';
 import 'package:footlog/domain/matches/entities/opponent.dart';
 import 'package:footlog/domain/matches/enums/field_type.dart';
@@ -13,8 +12,8 @@ import 'package:footlog/domain/matches/enums/weather.dart';
 
 import 'package:footlog/domain/matches/usecases/add_match_usecase.dart';
 import 'package:footlog/domain/matches/usecases/upload_opponent_logo_usecase.dart';
-import 'package:footlog/domain/matches/usecases/upsert_opponent_from_match_usecase.dart';
 import 'package:footlog/domain/matches/usecases/upload_your_team_logo_usecase.dart';
+import 'package:footlog/domain/matches/usecases/upsert_opponent_from_match_usecase.dart';
 
 import 'add_match_state.dart';
 
@@ -56,7 +55,6 @@ class AddMatchCubit extends Cubit<AddMatchState> {
       emit(state.copyWith(opponentLogoUrl: url));
   void setYourLogo(String? url) => emit(state.copyWith(yourLogoUrl: url));
 
-  // выбрать соперника из «последних»
   void setOpponentFromRecent(Opponent o) => emit(
     state.copyWith(
       opponentId: o.id,
@@ -82,31 +80,14 @@ class AddMatchCubit extends Cubit<AddMatchState> {
     ));
   }
 
-  void incGoals() => setPersonalStats(goals: state.myGoals + 1);
-  void decGoals() => setPersonalStats(goals: state.myGoals - 1);
-
-  void incAssists() => setPersonalStats(assists: state.myAssists + 1);
-  void decAssists() => setPersonalStats(assists: state.myAssists - 1);
-
-  void incInterceptions() =>
-      setPersonalStats(interceptions: state.myInterceptions + 1);
-  void decInterceptions() =>
-      setPersonalStats(interceptions: state.myInterceptions - 1);
-
-  void incTackles() => setPersonalStats(tackles: state.myTackles + 1);
-  void decTackles() => setPersonalStats(tackles: state.myTackles - 1);
-
-  void incSaves() => setPersonalStats(saves: state.mySaves + 1);
-  void decSaves() => setPersonalStats(saves: state.mySaves - 1);
-
   // ---------- загрузка логотипов ----------
   Future<void> pickAndUploadOpponentLogo() async {
+    if (state.isUploadingOpponentLogo) return;
     try {
       final name = state.opponentTeam.trim();
       if (name.isEmpty) return;
 
       final id = Opponent.idFromName(name);
-
       final picked = await ImagePicker().pickImage(
         source: ImageSource.gallery,
         imageQuality: 85,
@@ -114,22 +95,36 @@ class AddMatchCubit extends Cubit<AddMatchState> {
       if (picked == null) return;
 
       final bytes = await picked.readAsBytes();
+
+      emit(state.copyWith(isUploadingOpponentLogo: true, error: null));
 
       final url = await getIt<UploadOpponentLogoUseCase>()(
         uid,
         opponentId: id,
         bytes: bytes,
-        contentType: 'image/jpeg',
+        contentType: picked.name.toLowerCase().endsWith('.png')
+            ? 'image/png'
+            : 'image/jpeg',
       );
 
       setOpponentLogo(url);
     } catch (e) {
       emit(state.copyWith(error: e.toString()));
+    } finally {
+      emit(state.copyWith(isUploadingOpponentLogo: false));
     }
   }
 
   Future<void> pickAndUploadYourLogo() async {
+    if (state.isUploadingYourLogo) return;
     try {
+      final name = state.yourTeam.trim();
+      if (name.isEmpty) {
+        emit(state.copyWith(error: 'Сначала укажи название вашей команды'));
+        return;
+      }
+      final teamId = name.toLowerCase().replaceAll(RegExp(r'\s+'), '_');
+
       final picked = await ImagePicker().pickImage(
         source: ImageSource.gallery,
         imageQuality: 85,
@@ -138,15 +133,22 @@ class AddMatchCubit extends Cubit<AddMatchState> {
 
       final bytes = await picked.readAsBytes();
 
+      emit(state.copyWith(isUploadingYourLogo: true, error: null));
+
       final url = await getIt<UploadYourTeamLogoUseCase>()(
         uid,
+        teamId: teamId,
         bytes: bytes,
-        contentType: 'image/jpeg',
+        contentType: picked.name.toLowerCase().endsWith('.png')
+            ? 'image/png'
+            : 'image/jpeg',
       );
 
       setYourLogo(url);
     } catch (e) {
       emit(state.copyWith(error: e.toString()));
+    } finally {
+      emit(state.copyWith(isUploadingYourLogo: false));
     }
   }
 
@@ -161,7 +163,6 @@ class AddMatchCubit extends Cubit<AddMatchState> {
     emit(state.copyWith(saving: true, error: null));
 
     try {
-      // 1) апсерт соперника (RTDB)
       await getIt<UpsertOpponentFromMatchUseCase>()(
         uid,
         name: state.opponentTeam.trim(),
@@ -169,7 +170,6 @@ class AddMatchCubit extends Cubit<AddMatchState> {
         logoUrl: state.opponentLogoUrl,
       );
 
-      // 2) создаём матч (позиции в матче больше нет)
       final outcome = state.yourGoals == state.opponentGoals
           ? Outcome.draw
           : (state.yourGoals > state.opponentGoals ? Outcome.win : Outcome.loss);
@@ -184,6 +184,7 @@ class AddMatchCubit extends Cubit<AddMatchState> {
         fieldType: state.fieldType,
         weather: state.weather,
         outcome: outcome,
+        yourLogoUrl: state.yourLogoUrl,
         opponentLogoUrl: state.opponentLogoUrl,
         myGoals: state.myGoals,
         myAssists: state.myAssists,

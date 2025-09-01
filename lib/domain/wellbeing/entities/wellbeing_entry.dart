@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// Настроения (до/после)
-enum Mood { veryBad, bad, neutral, good, veryGood }
+enum Mood { bad, neutral, good, veryGood }
 
 /// Качество по шкале 3-х уровней
 enum Quality3 { bad, normal, good }

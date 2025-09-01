@@ -11,6 +11,8 @@ class StatsBundle {
   final List<int> assists;         // мои ассисты
   final List<int> interceptions;   // мои перехваты
   final List<int> tackles;         // мои отборы
+  final List<int> saves;           // 👈 МОИ СЕЙВЫ
+
   StatsBundle({
     required this.labels,
     required this.matches,
@@ -18,5 +20,6 @@ class StatsBundle {
     required this.assists,
     required this.interceptions,
     required this.tackles,
+    required this.saves,
   });
 }

@@ -17,23 +17,20 @@ class MatchesRepositoryImpl implements MatchesRepository {
   CollectionReference<Map<String, dynamic>> _col(String uid) =>
       db.collection('users').doc(uid).collection('matches');
 
-  // ---------- mappers: enum <-> string ----------
+  // ---------- enum mappers ----------
   String _fieldToStr(FieldType f) => f.name;
   FieldType _fieldFrom(String s) =>
-      FieldType.values.firstWhere((e) => e.name == s,
-          orElse: () => FieldType.natural);
+      FieldType.values.firstWhere((e) => e.name == s, orElse: () => FieldType.natural);
 
   String _weatherToStr(Weather w) => w.name;
   Weather _weatherFrom(String s) =>
-      Weather.values.firstWhere((e) => e.name == s,
-          orElse: () => Weather.sunny);
+      Weather.values.firstWhere((e) => e.name == s, orElse: () => Weather.sunny);
 
   String _outcomeToStr(Outcome o) => o.name;
   Outcome _outcomeFrom(String s) =>
-      Outcome.values.firstWhere((e) => e.name == s,
-          orElse: () => Outcome.draw);
+      Outcome.values.firstWhere((e) => e.name == s, orElse: () => Outcome.draw);
 
-  // ---------- Domain <-> DTO ----------
+  // ---------- domain <-> dto ----------
   MatchDto _toDto(MatchItem m) => MatchDto(
     id: m.id,
     date: Timestamp.fromDate(m.date),
@@ -45,9 +42,9 @@ class MatchesRepositoryImpl implements MatchesRepository {
     fieldType: _fieldToStr(m.fieldType),
     weather: _weatherToStr(m.weather),
     outcome: _outcomeToStr(m.outcome),
+    // 👇 ДОБАВИЛИ yourLogoUrl
+    yourLogoUrl: m.yourLogoUrl,
     opponentLogoUrl: m.opponentLogoUrl,
-
-    // личная статистика (null в домене → 0 в DTO)
     myGoals: m.myGoals ?? 0,
     myAssists: m.myAssists ?? 0,
     myTackles: m.myTackles ?? 0,
@@ -57,7 +54,6 @@ class MatchesRepositoryImpl implements MatchesRepository {
 
   MatchItem _toDomain(MatchDto d) => MatchItem(
     id: d.id,
-    opponentLogoUrl: d.opponentLogoUrl,
     date: d.date.toDate(),
     durationMin: d.durationMin,
     yourTeam: d.yourTeam,
@@ -67,7 +63,9 @@ class MatchesRepositoryImpl implements MatchesRepository {
     fieldType: _fieldFrom(d.fieldType),
     weather: _weatherFrom(d.weather),
     outcome: _outcomeFrom(d.outcome),
-
+    // 👇 ПРОКИДЫВАЕМ ОБА URL
+    yourLogoUrl: d.yourLogoUrl,
+    opponentLogoUrl: d.opponentLogoUrl,
     myGoals: d.myGoals,
     myAssists: d.myAssists,
     myTackles: d.myTackles,
@@ -85,9 +83,7 @@ class MatchesRepositoryImpl implements MatchesRepository {
 
   @override
   Future<void> updateMatch(String uid, MatchItem m) async {
-    if (m.id == null) {
-      throw Exception('updateMatch: id is null');
-    }
+    if (m.id == null) throw Exception('updateMatch: id is null');
     final dto = _toDto(m);
     await _col(uid).doc(m.id!).set(dto.toJson(), SetOptions(merge: true));
   }
@@ -100,19 +96,14 @@ class MatchesRepositoryImpl implements MatchesRepository {
   // ========== Read ==========
   @override
   Future<List<RecentMatch>> getRecentMatches(String uid, {int limit = 5}) async {
-    final snap = await _col(uid)
-        .orderBy('date', descending: true)
-        .limit(limit)
-        .get();
+    final snap = await _col(uid).orderBy('date', descending: true).limit(limit).get();
 
     return snap.docs.map((d) {
       final dto = MatchDto.fromJson(d.id, d.data());
 
       final you = dto.yourGoals;
       final opp = dto.opponentGoals;
-      final out = you == opp
-          ? Outcome.draw
-          : (you > opp ? Outcome.win : Outcome.loss);
+      final out = you == opp ? Outcome.draw : (you > opp ? Outcome.win : Outcome.loss);
 
       return RecentMatch(
         id: d.id,
@@ -122,6 +113,8 @@ class MatchesRepositoryImpl implements MatchesRepository {
         yourGoals: you,
         opponentGoals: opp,
         outcome: out,
+        // 👇 читаем оба
+        yourLogoUrl: dto.yourLogoUrl,
         opponentLogoUrl: dto.opponentLogoUrl,
       );
     }).toList();

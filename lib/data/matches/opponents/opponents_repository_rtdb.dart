@@ -1,3 +1,4 @@
+// lib/data/matches/opponents/opponents_repository_rtdb.dart
 import 'dart:typed_data';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -5,32 +6,40 @@ import 'package:footlog/domain/matches/entities/opponent.dart';
 import 'package:footlog/domain/matches/repositories/opponents_repository.dart';
 
 class OpponentsRepositoryRtdb implements IOpponentsRepository {
-  final FirebaseDatabase _db;
-  final FirebaseStorage _storage;
-  OpponentsRepositoryRtdb(this._db, this._storage);
+  final FirebaseDatabase db;
+  final FirebaseStorage storage;
+  OpponentsRepositoryRtdb(this.db, this.storage);
 
-  DatabaseReference _col(String uid) => _db.ref('users/$uid/opponents');
+  DatabaseReference _opRef(String uid, String opponentId) =>
+      db.ref('users/$uid/opponents/$opponentId');
 
   @override
   Future<List<Opponent>> getRecent(String uid, {int limit = 20}) async {
-    final q = _col(uid).orderByChild('lastPlayedAt').limitToLast(limit);
-    final snap = await q.get();
-    if (!snap.exists) return const [];
+    // сортировка по последней дате и/или количеству — зависит от твоих данных
+    final snap = await db.ref('users/$uid/opponents')
+        .orderByChild('lastPlayedAt')
+        .limitToLast(limit)
+        .get();
+
+    if (!snap.exists) return [];
+
     final list = <Opponent>[];
     for (final c in snap.children) {
-      final m = Map<String, dynamic>.from(c.value as Map);
-      list.add(Opponent.fromMap(c.key!, m));
+      final data = (c.value as Map).cast<String, dynamic>();
+      list.add(Opponent.fromMap(c.key!, data));
     }
-    // orderByChild + limitToLast -> от старых к новым; разворачиваем, чтобы новые сверху
-    list.sort((a, b) => (b.lastPlayedAt ?? DateTime(0)).compareTo(a.lastPlayedAt ?? DateTime(0)));
+
+    // limitToLast даёт по возрастанию — развернём по убыванию
+    list.sort((a, b) => (b.lastPlayedAt ?? DateTime(0))
+        .compareTo(a.lastPlayedAt ?? DateTime(0)));
     return list;
   }
 
   @override
   Future<Opponent?> getById(String uid, String id) async {
-    final snap = await _col(uid).child(id).get();
-    if (!snap.exists || snap.value == null) return null;
-    final m = Map<String, dynamic>.from(snap.value as Map);
+    final s = await _opRef(uid, id).get();
+    if (!s.exists) return null;
+    final m = (s.value as Map).cast<String, dynamic>();
     return Opponent.fromMap(id, m);
   }
 
@@ -42,30 +51,24 @@ class OpponentsRepositoryRtdb implements IOpponentsRepository {
         String? logoUrl,
       }) async {
     final id = Opponent.idFromName(name);
-    final ref = _col(uid).child(id);
-    final nowTs = (playedAt ?? DateTime.now()).millisecondsSinceEpoch;
+    final ref = _opRef(uid, id);
+    final now = playedAt ?? DateTime.now();
 
+    // читаем текущее, чтобы нарастить matchesCount
     final snap = await ref.get();
-    if (snap.exists && snap.value != null) {
-      final data = Map<String, dynamic>.from(snap.value as Map);
-      final cnt = (data['matchesCount'] as num?)?.toInt() ?? 0;
-      final currentLogo = data['logoUrl'] as String?;
-      await ref.update({
-        'name': name.trim(),
-        'lastPlayedAt': nowTs,
-        'matchesCount': cnt + 1,
-        if (logoUrl != null && (currentLogo == null || currentLogo.isEmpty)) 'logoUrl': logoUrl,
-        'name_lc': name.toLowerCase(),
-      });
-    } else {
-      await ref.set({
-        'name': name.trim(),
-        'logoUrl': logoUrl,
-        'lastPlayedAt': nowTs,
-        'matchesCount': 1,
-        'name_lc': name.toLowerCase(),
-      });
+    int current = 0;
+    if (snap.exists) {
+      final m = (snap.value as Map).cast<String, dynamic>();
+      current = (m['matchesCount'] as num?)?.toInt() ?? 0;
     }
+
+    await ref.update({
+      'name': name.trim(),
+      'name_lc': name.trim().toLowerCase(),
+      'lastPlayedAt': now.millisecondsSinceEpoch,
+      'matchesCount': current + 1,
+      if (logoUrl != null && logoUrl.isNotEmpty) 'logoUrl': logoUrl,
+    });
   }
 
   @override
@@ -75,9 +78,22 @@ class OpponentsRepositoryRtdb implements IOpponentsRepository {
         required List<int> bytes,
         String contentType = 'image/jpeg',
       }) async {
-    final path = 'users/$uid/opponents/$opponentId/logo.jpg';
-    final ref = _storage.ref(path);
-    await ref.putData(Uint8List.fromList(bytes), SettableMetadata(contentType: contentType));
-    return await ref.getDownloadURL();
+    // Определим расширение в зависимости от contentType
+    final isPng = contentType.toLowerCase().contains('png');
+    final ext = isPng ? 'png' : 'jpg';
+
+    final ref = storage.ref('users/$uid/opponents/$opponentId/logo.$ext');
+
+    await ref.putData(
+      Uint8List.fromList(bytes),
+      SettableMetadata(contentType: contentType),
+    );
+
+    final url = await ref.getDownloadURL();
+
+    // Не обязательно, но удобно сразу обновить RTDB, чтобы «последние» увидели картинку
+    await _opRef(uid, opponentId).update({'logoUrl': url});
+
+    return url;
   }
 }

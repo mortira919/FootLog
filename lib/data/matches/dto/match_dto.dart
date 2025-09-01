@@ -1,38 +1,27 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// Каноничный формат хранения матча в Firestore.
-/// Коллекция: users/{uid}/matches/{matchId}
 class MatchDto {
   final String? id;
-  final Timestamp date;          // начало матча
-  final int durationMin;         // длительность (мин)
+  final Timestamp date;
+  final int durationMin;
   final String yourTeam;
   final String opponentTeam;
   final int yourGoals;
   final int opponentGoals;
-
-  // ПОЛЯ ПОЗИЦИИ УДАЛЕНЫ (позиция хранится в профиле игрока)
-
-  /// 'natural' | 'artificial' | 'indoor'
   final String fieldType;
-
-  /// 'sunny' | 'cloudy' | 'rainSnow'
   final String weather;
-
-  /// 'win' | 'loss' | 'draw'
   final String outcome;
 
-  /// URL логотипа соперника (может быть null)
+  // 👇 ЛОГОТИПЫ
+  final String? yourLogoUrl;
   final String? opponentLogoUrl;
 
-  /// личная статистика игрока (всегда лежит в доке, по умолчанию 0)
+  // личная статистика
   final int myGoals;
   final int myAssists;
   final int myTackles;
   final int myInterceptions;
   final int mySaves;
-
-  final Timestamp? updatedAt;
 
   MatchDto({
     this.id,
@@ -45,40 +34,50 @@ class MatchDto {
     required this.fieldType,
     required this.weather,
     required this.outcome,
+    this.yourLogoUrl,
     this.opponentLogoUrl,
     this.myGoals = 0,
     this.myAssists = 0,
     this.myTackles = 0,
     this.myInterceptions = 0,
     this.mySaves = 0,
-    this.updatedAt,
   });
 
-  factory MatchDto.fromJson(String id, Map<String, dynamic> j) => MatchDto(
-    id: id,
-    date: j['date'] as Timestamp,
-    durationMin: (j['durationMin'] as num?)?.toInt() ?? 90,
-    yourTeam: (j['yourTeam'] ?? '') as String,
-    opponentTeam: (j['opponentTeam'] ?? '') as String,
-    yourGoals: (j['yourGoals'] as num?)?.toInt() ?? 0,
-    opponentGoals: (j['opponentGoals'] as num?)?.toInt() ?? 0,
+  factory MatchDto.fromJson(String id, Map<String, dynamic> j) {
+    DateTime _date(dynamic v) {
+      if (v is Timestamp) return v.toDate();
+      if (v is int) return DateTime.fromMillisecondsSinceEpoch(v);
+      return DateTime.parse(v as String);
+    }
 
-    // position/positionInMatch могут быть в старых документах — просто игнорируем
+    int _i(dynamic v) => v is num ? v.toInt() : 0;
+    String _s(dynamic v) => (v is String) ? v : (v ?? '').toString();
 
-    fieldType: (j['fieldType'] ?? 'natural') as String,
-    weather: (j['weather'] ?? 'sunny') as String,
-    outcome: (j['outcome'] ?? 'draw') as String,
+    // приводим к Timestamp для единообразия
+    final ts = j['date'] is Timestamp
+        ? j['date'] as Timestamp
+        : Timestamp.fromDate(_date(j['date']));
 
-    opponentLogoUrl: j['opponentLogoUrl'] as String?,
-
-    myGoals: (j['myGoals'] as num?)?.toInt() ?? 0,
-    myAssists: (j['myAssists'] as num?)?.toInt() ?? 0,
-    myTackles: (j['myTackles'] as num?)?.toInt() ?? 0,
-    myInterceptions: (j['myInterceptions'] as num?)?.toInt() ?? 0,
-    mySaves: (j['mySaves'] as num?)?.toInt() ?? 0,
-
-    updatedAt: j['updatedAt'] as Timestamp?,
-  );
+    return MatchDto(
+      id: id,
+      date: ts,
+      durationMin: _i(j['durationMin']),
+      yourTeam: _s(j['yourTeam']),
+      opponentTeam: _s(j['opponentTeam']),
+      yourGoals: _i(j['yourGoals']),
+      opponentGoals: _i(j['opponentGoals']),
+      fieldType: _s(j['fieldType']),
+      weather: _s(j['weather']),
+      outcome: _s(j['outcome']),
+      yourLogoUrl: j['yourLogoUrl'] as String?,
+      opponentLogoUrl: j['opponentLogoUrl'] as String?,
+      myGoals: _i(j['myGoals']),
+      myAssists: _i(j['myAssists']),
+      myTackles: _i(j['myTackles']),
+      myInterceptions: _i(j['myInterceptions']),
+      mySaves: _i(j['mySaves']),
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     'date': date,
@@ -87,18 +86,16 @@ class MatchDto {
     'opponentTeam': opponentTeam,
     'yourGoals': yourGoals,
     'opponentGoals': opponentGoals,
-    // позицию больше НЕ пишем
     'fieldType': fieldType,
     'weather': weather,
     'outcome': outcome,
+    // 👇 ОБА URL СКЛАДЫВАЕМ
+    if (yourLogoUrl != null) 'yourLogoUrl': yourLogoUrl,
     if (opponentLogoUrl != null) 'opponentLogoUrl': opponentLogoUrl,
-
     'myGoals': myGoals,
     'myAssists': myAssists,
     'myTackles': myTackles,
     'myInterceptions': myInterceptions,
     'mySaves': mySaves,
-
-    'updatedAt': FieldValue.serverTimestamp(),
   };
 }

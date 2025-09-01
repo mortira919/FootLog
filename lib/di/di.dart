@@ -18,21 +18,19 @@ import 'package:footlog/domain/auth/usecases/update_password_usecase.dart';
 import 'package:footlog/domain/auth/usecases/sign_in_with_google_use_case.dart';
 import 'package:footlog/domain/auth/usecases/logout_usecase.dart';
 import 'package:footlog/presentation/cubit/auth/auth_cubit.dart';
-import 'package:footlog/domain/matches/usecases/upload_your_team_logo_usecase.dart';
 
 // ===== HOME (Profile / QuickStats / Recent) =====
-import 'package:footlog/domain/home/repositories/profile_repositories.dart';
-import 'package:footlog/data/home/mocks/profile_repository_mock.dart';
-import 'package:footlog/data/home/repositories/profile_repository_impl.dart';
-// импорты
-
+import 'package:footlog/domain/home/repositories/profile_repositories.dart' as home_profile;
+import 'package:footlog/data/home/mocks/profile_repository_mock.dart' as home_profile_mock;
+import 'package:footlog/data/home/repositories/profile_repository_impl.dart' as home_profile_impl;
 
 import 'package:footlog/domain/home/usecases/get_player_profile_usecase.dart';
 import 'package:footlog/domain/home/usecases/save_player_profile_usecase.dart';
 import 'package:footlog/domain/home/usecases/get_quick_stats_usecase.dart';
 import 'package:footlog/domain/home/usecases/get_recent_matches_usecase.dart';
 
-import 'package:footlog/data/home/repositories/home_matches_repository_adapter.dart';
+// читаем recent matches с обоими logoUrl
+import 'package:footlog/data/home/repositories/matches_repository_impl.dart' as home_matches_impl;
 import 'package:footlog/domain/home/repositories/matches_repository.dart' as home_repos;
 
 // ===== MATCHES feature (add/update/delete) =====
@@ -41,7 +39,6 @@ import 'package:footlog/data/matches/repositories/matches_repository_impl.dart';
 import 'package:footlog/domain/matches/usecases/add_match_usecase.dart';
 import 'package:footlog/domain/matches/usecases/update_match_usecase.dart';
 import 'package:footlog/domain/matches/usecases/delete_match_usecase.dart';
-import 'package:footlog/data/home/mocks/stats_repository_mock.dart' as stats_mock;
 
 // ===== OPPONENTS (recent + logo) =====
 import 'package:footlog/domain/matches/repositories/opponents_repository.dart';
@@ -50,16 +47,26 @@ import 'package:footlog/domain/matches/usecases/get_recent_opponents_usecase.dar
 import 'package:footlog/domain/matches/usecases/upsert_opponent_from_match_usecase.dart';
 import 'package:footlog/domain/matches/usecases/upload_opponent_logo_usecase.dart';
 
-// ===== PERFORMANCE STATS (общий репозиторий для Home и экрана «Статистика») =====
-import 'package:footlog/domain/stats/repositories/stats_repository.dart' as stats; // ← ЕДИНСТВЕННЫЙ интерфейс
-import 'package:footlog/data/stats/stats_repository_impl.dart' as stats_impl;
-// если мок лежит у тебя в другом месте — поменяй путь на свой:
+// ===== YOUR TEAMS (аналог opponents) =====
+import 'package:footlog/domain/matches/repositories/your_teams_repository.dart';
+import 'package:footlog/data/matches/your_teams/your_teams_repository_rtdb.dart';
+import 'package:footlog/domain/matches/usecases/upload_your_team_logo_usecase.dart';
 
+// ===== STATS =====
+import 'package:footlog/domain/stats/repositories/stats_repository.dart' as stats;
+import 'package:footlog/data/stats/stats_repository_impl.dart' as stats_impl;
+import 'package:footlog/data/home/mocks/stats_repository_mock.dart' as stats_mock;
 import 'package:footlog/presentation/cubit/stats/stats_cubit.dart';
 
-import '../data/wellbeing/repository/wellbeing_repository_impl.dart';
-import '../domain/wellbeing/repositories/wellbeing_repository.dart';
-import '../presentation/cubit/wellbeing/wellbeing_cubit.dart';
+// ===== WELLBEING =====
+import 'package:footlog/data/wellbeing/repository/wellbeing_repository_impl.dart';
+import 'package:footlog/domain/wellbeing/repositories/wellbeing_repository.dart';
+import 'package:footlog/presentation/cubit/wellbeing/wellbeing_cubit.dart';
+
+// ===== PROFILE (экран редактирования профиля) =====
+import 'package:footlog/domain/profile/repositories/profile_repository.dart' as edit_profile;
+import 'package:footlog/data/profile/repositories/profile_repository_impl.dart' as edit_profile_impl;
+import 'package:footlog/presentation/cubit/profile/profile_cubit.dart';
 
 final getIt = GetIt.instance;
 
@@ -76,7 +83,6 @@ Future<void> initDependencies({bool useMocks = true}) async {
     getIt<FirebaseAuth>(),
     getIt<GoogleSignIn>(),
   ));
-  _factory(() => UploadYourTeamLogoUseCase(getIt()));
   _factory(() => LoginWithEmailUseCase(getIt()));
   _factory(() => RegisterWithEmailUseCase(getIt()));
   _factory(() => ResetPasswordUseCase(getIt()));
@@ -92,44 +98,39 @@ Future<void> initDependencies({bool useMocks = true}) async {
     logoutUseCase: getIt(),
   ));
 
-  // ===== HOME: Profile =====
+  // ===== HOME: Profile (для главного экрана) =====
   if (useMocks) {
-    _lazy<ProfileRepository>(() => ProfileRepositoryMock());
+    _lazy<home_profile.ProfileRepository>(() => home_profile_mock.ProfileRepositoryMock());
   } else {
-    _lazy<ProfileRepository>(() => ProfileRepositoryImpl(getIt<FirebaseFirestore>()));
+    _lazy<home_profile.ProfileRepository>(() => home_profile_impl.ProfileRepositoryImpl(getIt<FirebaseFirestore>()));
   }
+  _factory(() => GetPlayerProfileUseCase(getIt<home_profile.ProfileRepository>()));
+  _factory(() => SavePlayerProfileUseCase(getIt<home_profile.ProfileRepository>()));
 
-  // ===== MATCHES (реальный Firestore) =====
-  _lazy<matches_repos.MatchesRepository>(
-          () => MatchesRepositoryImpl(getIt<FirebaseFirestore>()));
+  // ===== MATCHES (FS для добавления/редактирования) =====
+  _lazy<matches_repos.MatchesRepository>(() => MatchesRepositoryImpl(getIt<FirebaseFirestore>()));
+  _factory(() => AddMatchUseCase(getIt<matches_repos.MatchesRepository>()));
+  _factory(() => UpdateMatchUseCase(getIt<matches_repos.MatchesRepository>()));
+  _factory(() => DeleteMatchUseCase(getIt<matches_repos.MatchesRepository>()));
 
-  // HOME.RecentMatches — адаптер над реальным репозиторием матчей
-  _lazy<home_repos.MatchesRepository>(
-          () => HomeMatchesRepositoryAdapter(getIt<matches_repos.MatchesRepository>()));
-
-  // UseCases (HOME)
-  _factory(() => GetPlayerProfileUseCase(getIt<ProfileRepository>()));
-  _factory(() => SavePlayerProfileUseCase(getIt<ProfileRepository>()));
+  // ===== HOME: RecentMatches (читает yourLogoUrl + opponentLogoUrl) =====
+  _lazy<home_repos.MatchesRepository>(() => home_matches_impl.HomeMatchesRepositoryImpl(getIt<FirebaseFirestore>()));
   _factory(() => GetRecentMatchesUseCase(getIt<home_repos.MatchesRepository>()));
 
-  // ===== STATS (один общий источник для Home QuickStats и экрана «Статистика») =====
+  // ===== STATS =====
   if (useMocks) {
     _lazy<stats.StatsRepository>(() => stats_mock.StatsRepositoryMock());
   } else {
     _lazy<stats.StatsRepository>(() => stats_impl.StatsRepositoryImpl(getIt<FirebaseFirestore>()));
   }
-
-  // QuickStats на Home считает из ЭТОГО ЖЕ репозитория
   _factory(() => GetQuickStatsUseCase(getIt<stats.StatsRepository>()));
-
-  // Экран «Статистика»: кубит с параметром uid
-  if (!GetIt.I.isRegistered<StatsCubit>()) {
+  if (!getIt.isRegistered<StatsCubit>()) {
     getIt.registerFactoryParam<StatsCubit, String, void>(
           (uid, _) => StatsCubit(getIt<stats.StatsRepository>(), uid),
     );
   }
 
-  // ===== OPPONENTS =====
+  // ===== OPPONENTS (RTDB + Storage) =====
   _lazy<IOpponentsRepository>(() => OpponentsRepositoryRtdb(
     getIt<FirebaseDatabase>(),
     getIt<FirebaseStorage>(),
@@ -138,15 +139,16 @@ Future<void> initDependencies({bool useMocks = true}) async {
   _factory(() => UpsertOpponentFromMatchUseCase(getIt<IOpponentsRepository>()));
   _factory(() => UploadOpponentLogoUseCase(getIt<IOpponentsRepository>()));
 
-  // UseCases (MATCHES feature)
-  _factory(() => AddMatchUseCase(getIt<matches_repos.MatchesRepository>()));
-  _factory(() => UpdateMatchUseCase(getIt<matches_repos.MatchesRepository>()));
-  _factory(() => DeleteMatchUseCase(getIt<matches_repos.MatchesRepository>()));
+  // ===== YOUR TEAMS (аналог opponents; хранит лого вашей команды) =====
+  _lazy<IYourTeamsRepository>(() => YourTeamsRepositoryRtdb(
+    getIt<FirebaseDatabase>(),
+    getIt<FirebaseStorage>(),
+  ));
+  _factory(() => UploadYourTeamLogoUseCase(getIt<IYourTeamsRepository>()));
+
   // ===== WELLBEING =====
   _lazy<WellbeingRepository>(() => WellbeingRepositoryImpl(getIt<FirebaseFirestore>()));
-
-// фабрика кубита с параметром uid
-  if (!GetIt.I.isRegistered<WellbeingCubit>()) {
+  if (!getIt.isRegistered<WellbeingCubit>()) {
     getIt.registerFactoryParam<WellbeingCubit, String, DateTime?>(
           (uid, initialDate) {
         final c = WellbeingCubit(uid: uid, repo: getIt<WellbeingRepository>());
@@ -156,12 +158,23 @@ Future<void> initDependencies({bool useMocks = true}) async {
     );
   }
 
+  // ===== PROFILE (экран редактирования профиля) =====
+  _lazy<edit_profile.ProfileRepository>(() => edit_profile_impl.ProfileRepositoryImpl(getIt<FirebaseFirestore>()));
+  if (!getIt.isRegistered<ProfileCubit>()) {
+    getIt.registerFactoryParam<ProfileCubit, String, void>(
+          (uid, _) => ProfileCubit(
+        repo: getIt<edit_profile.ProfileRepository>(),
+        uid: uid,
+      ),
+    );
+  }
 }
 
 // ---- helpers
 void _lazy<T extends Object>(T Function() f) {
-  if (!GetIt.I.isRegistered<T>()) getIt.registerLazySingleton<T>(f);
+  if (!getIt.isRegistered<T>()) getIt.registerLazySingleton<T>(f);
 }
+
 void _factory<T extends Object>(T Function() f) {
-  if (!GetIt.I.isRegistered<T>()) getIt.registerFactory<T>(f);
+  if (!getIt.isRegistered<T>()) getIt.registerFactory<T>(f);
 }

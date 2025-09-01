@@ -1,3 +1,4 @@
+// lib/presentation/widgets/wellbeing/field_weather_segment.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:footlog/domain/matches/enums/field_type.dart';
@@ -58,7 +59,7 @@ class FieldWeatherSegment extends StatelessWidget {
   }
 }
 
-/// Фиксированная ширина трека по фигме и центрирование.
+/// Фиксированная ширина трека по фигме и центрирование (329 px).
 class _TrackWidth extends StatelessWidget {
   final Widget child;
   const _TrackWidth({required this.child});
@@ -75,8 +76,8 @@ class _TrackWidth extends StatelessWidget {
   }
 }
 
-/// Трек 329×28, 3 равные секции с разделителями.
-/// Выбранная секция — белая таблетка 24h с тенью. Текст масштабируется вниз и не вылазит.
+/// Трек 329×28, равные секции с разделителями.
+/// Выбранная секция — белая «таблетка» 24 px с тенью. Текст масштабируется вниз.
 class _TrackSegmented<T> extends StatelessWidget {
   final T value;
   final ValueChanged<T> onChanged;
@@ -90,22 +91,22 @@ class _TrackSegmented<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final index = items.indexWhere((e) => e.value == value).clamp(0, items.length - 1);
+    final idx = items.indexWhere((e) => e.value == value).clamp(0, items.length - 1);
     final trackH = 28.h;
     final pillH = 24.h;
-    final trackR = 14.r;
-    final pillR = 12.r;
+    final trackR = 7.r;  // как в исходном контроле
+    final pillR = 6.r;
 
     final textSel = TextStyle(
-      fontSize: 17.sp,
+      fontSize: 14.sp,
       fontWeight: FontWeight.w700,
-      height: 18 / 17,
+      height: 1.1,
       color: AppColors.black,
     );
     final textDef = TextStyle(
-      fontSize: 17.sp,
+      fontSize: 14.sp,
       fontWeight: FontWeight.w400,
-      height: 18 / 17,
+      height: 1.1,
       color: AppColors.black.withOpacity(0.55),
     );
 
@@ -113,7 +114,7 @@ class _TrackSegmented<T> extends StatelessWidget {
       child: SizedBox(
         height: trackH,
         child: LayoutBuilder(builder: (ctx, c) {
-          final w = c.maxWidth;        // 329w
+          final w = c.maxWidth; // 329w
           final segW = w / items.length;
 
           return Stack(
@@ -136,10 +137,10 @@ class _TrackSegmented<T> extends StatelessWidget {
                   }),
                 ),
               ),
-              // белая «таблетка» строго внутри сегмента
+              // активная белая «пилюля» строго внутри сегмента
               Positioned(
                 top: (trackH - pillH) / 2,
-                left: index * segW + 4.w,
+                left: idx * segW + 4.w,
                 width: segW - 8.w,
                 height: pillH,
                 child: Container(
@@ -147,16 +148,12 @@ class _TrackSegmented<T> extends StatelessWidget {
                     color: AppColors.white,
                     borderRadius: BorderRadius.circular(pillR),
                     boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x1A000000),
-                        blurRadius: 8,
-                        offset: Offset(0, 2),
-                      ),
+                      BoxShadow(color: Color(0x1A000000), blurRadius: 8, offset: Offset(0, 2)),
                     ],
                   ),
                 ),
               ),
-              // кликабельные области с текстом — масштаб вниз, без обрезки/переноса
+              // кликабельные области с подписями
               Row(
                 children: [
                   for (int i = 0; i < items.length; i++)
@@ -170,12 +167,12 @@ class _TrackSegmented<T> extends StatelessWidget {
                           child: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 6.w),
                             child: FittedBox(
-                              fit: BoxFit.scaleDown, // сжимает шрифт при нехватке места
+                              fit: BoxFit.scaleDown,
                               child: Text(
                                 items[i].label,
                                 softWrap: false,
                                 overflow: TextOverflow.visible,
-                                style: i == index ? textSel : textDef,
+                                style: i == idx ? textSel : textDef,
                               ),
                             ),
                           ),

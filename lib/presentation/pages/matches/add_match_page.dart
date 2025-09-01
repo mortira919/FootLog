@@ -1,7 +1,7 @@
+// lib/presentation/pages/matches/add_match_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:image_picker/image_picker.dart';
 
 import 'package:footlog/di/di.dart';
 import 'package:footlog/core/app_theme.dart';
@@ -9,7 +9,6 @@ import 'package:footlog/core/my_result.dart';
 
 import 'package:footlog/domain/matches/entities/opponent.dart';
 import 'package:footlog/domain/matches/usecases/get_recent_opponents_usecase.dart';
-import 'package:footlog/domain/matches/usecases/upload_opponent_logo_usecase.dart';
 
 import 'package:footlog/presentation/cubit/matches/add_match/add_match_cubit.dart';
 import 'package:footlog/presentation/cubit/matches/add_match/add_match_state.dart';
@@ -32,7 +31,10 @@ class AddMatchPage extends StatelessWidget {
       listener: (ctx, s) {
         if (s.error != null) {
           ScaffoldMessenger.of(ctx).showSnackBar(
-            SnackBar(content: Text(s.error!), behavior: SnackBarBehavior.floating),
+            SnackBar(
+              content: Text(s.error!),
+              behavior: SnackBarBehavior.floating,
+            ),
           );
         }
       },
@@ -69,8 +71,13 @@ class AddMatchPage extends StatelessWidget {
                     spacing: 8.w,
                     runSpacing: 8.h,
                     children: [
-                      _InfoPill(text: _datePillLabel(context, state.date!)),
-                      _InfoPill(text: _durationPillLabel(context, state.durationMin)),
+                      _InfoPill(
+                        text: _datePillLabel(context, state.date!),
+                      ),
+                      _InfoPill(
+                        text: _durationPillLabel(
+                            context, state.durationMin),
+                      ),
                     ],
                   ),
                 ),
@@ -89,51 +96,32 @@ class AddMatchPage extends StatelessWidget {
                       child: GreenPillButton(
                         text: 'Выбрать соперника из последних',
                         onTap: () async {
-                          final picked = await _showOpponentPicker(context); // Opponent?
+                          final picked =
+                          await _showOpponentPicker(context); // Opponent?
                           if (picked != null) {
-                            context.read<AddMatchCubit>().setOpponentFromRecent(picked);
+                            context
+                                .read<AddMatchCubit>()
+                                .setOpponentFromRecent(picked);
                           }
                         },
-
                       ),
                     ),
 
                     SizedBox(height: 12.h),
 
-                    // заголовок "Команды"
-                    Center(
-                      child: Text(
-                        'Команды',
-                        style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w600, color: AppColors.black),
-                      ),
-                    ),
-
-                    SizedBox(height: 8.h),
-
-                    // плитки логотипов
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _LogoTile(
-                            title: 'Логотип вашей\nкоманды',
-                            imageUrl: context.watch<AddMatchCubit>().state.yourLogoUrl,
-                            onTap: () => context.read<AddMatchCubit>().pickAndUploadYourLogo(),
-                          ),
-                        ),
-                        SizedBox(width: 12.w),
-                        Expanded(
-                          child: _LogoTile(
-                            title: 'Логотип команды\nсоперников',
-                            imageUrl: context.watch<AddMatchCubit>().state.opponentLogoUrl,
-                            onTap: () => context.read<AddMatchCubit>().pickAndUploadOpponentLogo(),
-                          ),
-                        ),
-                      ],
+                    // --- Команды (как на макете) ---
+                    TeamsLogosRow(
+                      yourLogoUrl: state.yourLogoUrl,
+                      opponentLogoUrl: state.opponentLogoUrl,
+                      loadingYourLogo: state.isUploadingYourLogo,
+                      loadingOpponentLogo: state.isUploadingOpponentLogo,
+                      onPickYour: () => cubit.pickAndUploadYourLogo(),
+                      onPickOpponent: () => cubit.pickAndUploadOpponentLogo(),
                     ),
 
                     SizedBox(height: 12.h),
 
-                    // инпуты команд
+                    // Инпуты названий команд
                     TeamInputs(
                       yourTeam: state.yourTeam,
                       opponentTeam: state.opponentTeam,
@@ -146,7 +134,11 @@ class AddMatchPage extends StatelessWidget {
                     Center(
                       child: Text(
                         'Счёт матча',
-                        style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600, color: AppColors.black),
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.black,
+                        ),
                       ),
                     ),
                     SizedBox(height: 8.h),
@@ -154,15 +146,19 @@ class AddMatchPage extends StatelessWidget {
                     ScoreRowFigma(
                       label: 'Голы вашей команды',
                       value: state.yourGoals,
-                      onMinus: () => cubit.setGoals(you: (state.yourGoals - 1).clamp(0, 999)),
-                      onPlus: () => cubit.setGoals(you: (state.yourGoals + 1).clamp(0, 999)),
+                      onMinus: () => cubit
+                          .setGoals(you: (state.yourGoals - 1).clamp(0, 999)),
+                      onPlus: () => cubit
+                          .setGoals(you: (state.yourGoals + 1).clamp(0, 999)),
                     ),
                     SizedBox(height: 8.h),
                     ScoreRowFigma(
                       label: 'Голы соперника',
                       value: state.opponentGoals,
-                      onMinus: () => cubit.setGoals(opp: (state.opponentGoals - 1).clamp(0, 999)),
-                      onPlus: () => cubit.setGoals(opp: (state.opponentGoals + 1).clamp(0, 999)),
+                      onMinus: () => cubit
+                          .setGoals(opp: (state.opponentGoals - 1).clamp(0, 999)),
+                      onPlus: () => cubit
+                          .setGoals(opp: (state.opponentGoals + 1).clamp(0, 999)),
                     ),
                   ],
                 ),
@@ -181,24 +177,24 @@ class AddMatchPage extends StatelessWidget {
               ),
 
               SizedBox(height: 20.h),
-              // add_match_page.dart (в ListView children: [...])
-// ...
+
+              // ====== Личная статистика ======
               MatchSectionCard(
                 title: 'Ваша статистика в матче',
                 child: MatchPersonalStatsCard(
-                  goals:         state.myGoals,
-                  assists:       state.myAssists,
+                  goals: state.myGoals,
+                  assists: state.myAssists,
                   interceptions: state.myInterceptions,
-                  tackles:       state.myTackles,
-                  saves:         state.mySaves,
-                  onGoals:         (v) => cubit.setPersonalStats(goals: v),
-                  onAssists:       (v) => cubit.setPersonalStats(assists: v),
-                  onInterceptions: (v) => cubit.setPersonalStats(interceptions: v),
-                  onTackles:       (v) => cubit.setPersonalStats(tackles: v),
-                  onSaves:         (v) => cubit.setPersonalStats(saves: v),
+                  tackles: state.myTackles,
+                  saves: state.mySaves,
+                  onGoals: (v) => cubit.setPersonalStats(goals: v),
+                  onAssists: (v) => cubit.setPersonalStats(assists: v),
+                  onInterceptions: (v) =>
+                      cubit.setPersonalStats(interceptions: v),
+                  onTackles: (v) => cubit.setPersonalStats(tackles: v),
+                  onSaves: (v) => cubit.setPersonalStats(saves: v),
                 ),
               ),
-// ...
 
               SizedBox(height: 20.h),
 
@@ -222,18 +218,39 @@ class AddMatchPage extends StatelessWidget {
 
   // ===== helpers =====
 
-  static String _two(int v) => v.toString().padLeft(2, '0');
-
   static String _datePillLabel(BuildContext context, DateTime d) {
     final lang = Localizations.localeOf(context).languageCode;
     if (lang == 'ru') {
       const months = [
-        'января','февраля','марта','апреля','мая','июня',
-        'июля','августа','сентября','октября','ноября','декабря',
+        'января',
+        'февраля',
+        'марта',
+        'апреля',
+        'мая',
+        'июня',
+        'июля',
+        'августа',
+        'сентября',
+        'октября',
+        'ноября',
+        'декабря',
       ];
       return '${d.day} ${months[d.month - 1]} ${d.year}';
     } else {
-      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
+      ];
       return '${d.day} ${months[d.month - 1]} ${d.year}';
     }
   }
@@ -281,6 +298,36 @@ class _InfoPill extends StatelessWidget {
   }
 }
 
+// Небольшая зелёная таблетка-кнопка
+class GreenPillButton extends StatelessWidget {
+  final String text;
+  final VoidCallback? onTap;
+  const GreenPillButton({super.key, required this.text, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.primary.withOpacity(0.12),
+      borderRadius: BorderRadius.circular(999),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
+          child: Text(
+            text,
+            style: TextStyle(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w600,
+              fontSize: 14.sp,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 // ---- Pickers ----
 Future<(DateTime, int)?> _pickDateDuration(
     BuildContext context, {
@@ -294,33 +341,136 @@ Future<(DateTime, int)?> _pickDateDuration(
   );
 }
 
-class _LogoTile extends StatelessWidget {
-  final String title;
-  final String? imageUrl;
-  final VoidCallback? onTap;
-  const _LogoTile({required this.title, this.imageUrl, this.onTap});
+/// Заголовок «Команды» + две плитки логотипов
+class TeamsLogosRow extends StatelessWidget {
+  final String? yourLogoUrl;
+  final String? opponentLogoUrl;
+  final bool loadingYourLogo;
+  final bool loadingOpponentLogo;
+  final VoidCallback onPickYour;
+  final VoidCallback onPickOpponent;
+
+  const TeamsLogosRow({
+    super.key,
+    required this.yourLogoUrl,
+    required this.opponentLogoUrl,
+    required this.loadingYourLogo,
+    required this.loadingOpponentLogo,
+    required this.onPickYour,
+    required this.onPickOpponent,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final radius = 12.r;
+    return Column(
+      children: [
+        Center(
+          child: Text(
+            'Команды',
+            style: TextStyle(
+              fontSize: 17.sp,
+              fontWeight: FontWeight.w600,
+              color: AppColors.black,
+            ),
+          ),
+        ),
+        SizedBox(height: 8.h),
+        Row(
+          children: [
+            Expanded(
+              child: _LogoTile(
+                title: 'Логотип вашей\nкоманды',
+                imageUrl: yourLogoUrl,
+                loading: loadingYourLogo,
+                onTap: onPickYour,
+              ),
+            ),
+            SizedBox(width: 12.w),
+            Expanded(
+              child: _LogoTile(
+                title: 'Логотип команды\nсоперников',
+                imageUrl: opponentLogoUrl,
+                loading: loadingOpponentLogo,
+                onTap: onPickOpponent,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
 
-    Widget body;
+/// Квадратная плитка логотипа 72x72 с “+”
+class _LogoTile extends StatelessWidget {
+  final String title;
+  final String? imageUrl;
+  final bool loading;
+  final VoidCallback? onTap;
+
+  const _LogoTile({
+    required this.title,
+    this.imageUrl,
+    this.loading = false,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final r = 16.r;
+    final s = 72.w; // размер квадрата
+
+    Widget square;
     if (imageUrl != null && imageUrl!.isNotEmpty) {
-      body = ClipRRect(
-        borderRadius: BorderRadius.circular(radius),
-        child: Image.network(
-          imageUrl!,
-          height: 64.h,
-          width: double.infinity,
-          fit: BoxFit.cover,
+      square = ClipRRect(
+        borderRadius: BorderRadius.circular(r),
+        child: Stack(
+          children: [
+            SizedBox(
+              width: s,
+              height: s,
+              child: Image.network(
+                imageUrl!,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  color: const Color(0xFFF2F3F5),
+                  alignment: Alignment.center,
+                  child: const Icon(Icons.broken_image_outlined),
+                ),
+              ),
+            ),
+            if (loading)
+              Positioned.fill(
+                child: Container(
+                  color: Colors.black26,
+                  child: const Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       );
     } else {
-      body = SizedBox(
-        height: 64.h,
-        child: Center(
-          child: Icon(Icons.add, size: 24.sp, color: AppColors.black),
+      square = Container(
+        width: s,
+        height: s,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF1F2F4),
+          borderRadius: BorderRadius.circular(r),
         ),
+        alignment: Alignment.center,
+        child: loading
+            ? const SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        )
+            : Icon(Icons.add, size: 24.sp, color: AppColors.black.withOpacity(0.75)),
       );
     }
 
@@ -329,16 +479,19 @@ class _LogoTile extends StatelessWidget {
         Text(
           title,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 13.sp, color: AppColors.textGray, height: 1.15),
+          style: TextStyle(
+            fontSize: 14.sp,
+            color: AppColors.black,
+            height: 1.15,
+          ),
         ),
         SizedBox(height: 8.h),
         Material(
-          color: const Color(0xFFF2F3F5),
-          borderRadius: BorderRadius.circular(radius),
+          color: Colors.transparent,
           child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(radius),
-            child: body,
+            borderRadius: BorderRadius.circular(r),
+            onTap: loading ? null : onTap,
+            child: square,
           ),
         ),
       ],
@@ -349,12 +502,14 @@ class _LogoTile extends StatelessWidget {
 Future<Opponent?> _showOpponentPicker(BuildContext context) async {
   final items = await _loadRecentOpponents(context);
   if (items.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Пока нет последних соперников'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Пока нет последних соперников'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
     return null;
   }
 
@@ -399,7 +554,6 @@ Future<Opponent?> _showOpponentPicker(BuildContext context) async {
                   style: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w700),
                 ),
                 SizedBox(height: 12.h),
-
                 Expanded(
                   child: StatefulBuilder(
                     builder: (ctx, set) => ListView.separated(
@@ -435,7 +589,9 @@ Future<Opponent?> _showOpponentPicker(BuildContext context) async {
                                   isSel
                                       ? Icons.check_circle
                                       : Icons.radio_button_unchecked,
-                                  color: isSel ? AppColors.primary : AppColors.divider,
+                                  color: isSel
+                                      ? AppColors.primary
+                                      : AppColors.divider,
                                   size: 22.sp,
                                 ),
                               ],
@@ -446,9 +602,7 @@ Future<Opponent?> _showOpponentPicker(BuildContext context) async {
                     ),
                   ),
                 ),
-
                 SizedBox(height: 12.h),
-
                 SizedBox(
                   width: double.infinity,
                   height: 48.h,
@@ -468,43 +622,30 @@ Future<Opponent?> _showOpponentPicker(BuildContext context) async {
 
 Future<List<Opponent>> _loadRecentOpponents(BuildContext context) async {
   final uid = context.read<AddMatchCubit>().uid;
-  final uc = getIt<GetRecentOpponentsUseCase>();
-  final list = await uc(uid, limit: 20);
-  return list;
-}
+  try {
+    final uc = getIt<GetRecentOpponentsUseCase>();
+    final res = await uc(uid, limit: 20);
 
-Future<void> _pickOpponentLogo(BuildContext context) async {
-  final cubit = context.read<AddMatchCubit>();
-  final name = cubit.state.opponentTeam.trim();
+    if (res is List<Opponent>) return res;
 
-  if (name.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Сначала введи название команды соперника'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-    return;
+    if (res is MyResult<List<Opponent>>) {
+      return switch (res) {
+        Success(:final data) => data,
+        Error(:final message) => throw Exception(message),
+        _ => <Opponent>[],
+      };
+    }
+
+    return <Opponent>[];
+  } catch (e) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Ошибка загрузки соперников: $e'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+    return <Opponent>[];
   }
-
-  final picked = await ImagePicker().pickImage(
-    source: ImageSource.gallery,
-    imageQuality: 85,
-  );
-  if (picked == null) return;
-
-  final bytes = await picked.readAsBytes();
-  final id = Opponent.idFromName(name);
-
-  final url = await getIt<UploadOpponentLogoUseCase>()(
-    cubit.uid, // позиционный!
-    opponentId: id,
-    bytes: bytes,
-    contentType: 'image/jpeg', // или 'image/png' если выбрал png
-  );
-
-  cubit.setOpponentLogo(url);
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('Логотип соперника загружен')),
-  );
 }

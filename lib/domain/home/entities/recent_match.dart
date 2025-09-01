@@ -1,4 +1,3 @@
-// lib/domain/home/entities/recent_match.dart
 import 'package:footlog/domain/home/enums/outcome.dart';
 
 class RecentMatch {
@@ -13,6 +12,9 @@ class RecentMatch {
   /// URL логотипа соперника (может быть null)
   final String? opponentLogoUrl;
 
+  /// URL логотипа вашей команды (может быть null)
+  final String? yourLogoUrl; // 👈 ДОБАВИЛИ
+
   const RecentMatch({
     required this.id,
     required this.date,
@@ -22,6 +24,7 @@ class RecentMatch {
     required this.opponentGoals,
     required this.outcome,
     this.opponentLogoUrl,
+    this.yourLogoUrl, // 👈 ДОБАВИЛИ
   });
 
   RecentMatch copyWith({
@@ -33,6 +36,7 @@ class RecentMatch {
     int? opponentGoals,
     Outcome? outcome,
     String? opponentLogoUrl,
+    String? yourLogoUrl, // 👈 ДОБАВИЛИ
   }) {
     return RecentMatch(
       id: id ?? this.id,
@@ -43,6 +47,7 @@ class RecentMatch {
       opponentGoals: opponentGoals ?? this.opponentGoals,
       outcome: outcome ?? this.outcome,
       opponentLogoUrl: opponentLogoUrl ?? this.opponentLogoUrl,
+      yourLogoUrl: yourLogoUrl ?? this.yourLogoUrl, // 👈 ДОБАВИЛИ
     );
   }
 }

@@ -6,7 +6,10 @@ import 'package:footlog/domain/matches/enums/weather.dart';
 class MatchItem {
   final String? id;
 
-  /// URL логотипа соперника. Может быть null, если лого не загружали.
+  /// URL логотипа вашей команды. Может быть null.
+  final String? yourLogoUrl;
+
+  /// URL логотипа соперника. Может быть null.
   final String? opponentLogoUrl;
 
   // ===== базовые поля матча =====
@@ -29,6 +32,7 @@ class MatchItem {
 
   const MatchItem({
     this.id,
+    this.yourLogoUrl,
     this.opponentLogoUrl,
     required this.date,
     required this.durationMin,
@@ -48,6 +52,7 @@ class MatchItem {
 
   MatchItem copyWith({
     String? id,
+    String? yourLogoUrl,
     String? opponentLogoUrl,
     DateTime? date,
     int? durationMin,
@@ -66,6 +71,7 @@ class MatchItem {
   }) {
     return MatchItem(
       id: id ?? this.id,
+      yourLogoUrl: yourLogoUrl ?? this.yourLogoUrl,
       opponentLogoUrl: opponentLogoUrl ?? this.opponentLogoUrl,
       date: date ?? this.date,
       durationMin: durationMin ?? this.durationMin,
@@ -95,6 +101,7 @@ class MatchItem {
     'fieldType': fieldType.name,
     'weather': weather.name,
     'outcome': outcome.name,
+    if (yourLogoUrl != null) 'yourLogoUrl': yourLogoUrl,
     if (opponentLogoUrl != null) 'opponentLogoUrl': opponentLogoUrl,
 
     // личная статистика (null не пишем)
@@ -119,6 +126,7 @@ class MatchItem {
 
     return MatchItem(
       id: id,
+      yourLogoUrl: m['yourLogoUrl'] as String?,
       opponentLogoUrl: m['opponentLogoUrl'] as String?,
       date: parsedDate,
       durationMin: _readInt(m['durationMin'], 90),
@@ -129,7 +137,6 @@ class MatchItem {
       fieldType: FieldType.values.byName(readEnum(m['fieldType'])),
       weather: Weather.values.byName(readEnum(m['weather'])),
       outcome: Outcome.values.byName(readEnum(m['outcome'])),
-
       myGoals: _readInt(m['myGoals']),
       myAssists: _readInt(m['myAssists']),
       myTackles: _readInt(m['myTackles']),

@@ -50,18 +50,16 @@ class _StatsPageState extends State<StatsPage> {
             ),
             SizedBox(height: 10.h),
 
-            // Пример: карта «Количество голов» (как на макете)
             StatsBarCard(
               title: 'Количество голов',
               values: data.goals,
               labels: data.labels,
               centerTitle: true,
               showChevron: true,
-              height: 180, // можно подогнать
+              height: 180,
             ),
             SizedBox(height: 12.h),
 
-            // Остальные карты
             StatsBarCard(
               title: 'Количество матчей',
               values: data.matches,
@@ -96,6 +94,17 @@ class _StatsPageState extends State<StatsPage> {
               centerTitle: true,
               showChevron: true,
             ),
+            SizedBox(height: 12.h),
+
+            // 👇 НОВАЯ КАРТА
+            StatsBarCard(
+              title: 'Количество сейвов',
+              values: data.saves,
+              labels: data.labels,
+              centerTitle: true,
+              showChevron: true,
+            ),
+
             SizedBox(height: 24.h),
           ],
         );

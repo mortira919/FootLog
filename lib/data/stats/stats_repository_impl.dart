@@ -21,13 +21,14 @@ class StatsRepositoryImpl implements StatsRepository {
         .orderBy('date')
         .get();
 
-    // подготовим 0-масивы
+    // подготовим 0-массивы
     final labels = <String>[];
     final matches = List<int>.filled(months, 0);
     final goals = List<int>.filled(months, 0);
     final assists = List<int>.filled(months, 0);
     final interceptions = List<int>.filled(months, 0);
     final tackles = List<int>.filled(months, 0);
+    final saves = List<int>.filled(months, 0); // 👈
 
     // подписи месяцев
     const ruShort = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
@@ -52,6 +53,7 @@ class StatsRepositoryImpl implements StatsRepository {
       assists[idx] += dto.myAssists;
       interceptions[idx] += dto.myInterceptions;
       tackles[idx] += dto.myTackles;
+      saves[idx] += dto.mySaves; // 👈 счётчик сейвов
     }
 
     return StatsBundle(
@@ -61,6 +63,7 @@ class StatsRepositoryImpl implements StatsRepository {
       assists: assists,
       interceptions: interceptions,
       tackles: tackles,
+      saves: saves, // 👈
     );
   }
 }

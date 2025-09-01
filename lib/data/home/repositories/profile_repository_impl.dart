@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:footlog/domain/home/entities/player_profile.dart';
 
-import 'package:footlog/data/home/dto/player_profile_dto.dart';
-
 import '../../../domain/home/enums/positions.dart';
 import '../../../domain/home/repositories/profile_repositories.dart';
 
@@ -18,7 +16,6 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   // -- mapping helpers
   Position _fromString(String s) {
-    // наши enum значения UPPER_CASE: GK, CB, ...
     return Position.values.firstWhere(
           (p) => p.name.toUpperCase() == s.toUpperCase(),
       orElse: () => Position.ST,
@@ -30,37 +27,66 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<PlayerProfile> getProfile(String uid) async {
     final snap = await _doc(uid).get();
+    final data = snap.data();
 
-    if (!snap.exists || snap.data() == null) {
-      // Первый запуск — создаём дефолт
-      final defaultDto = PlayerProfileDto(
+    // Если профиля ещё нет — создаём дефолт СРАЗУ в обоих форматах
+    if (data == null) {
+      final pos = 'ST';
+      await _doc(uid).set({
+        'name': 'Имя Фамилия',
+        // старый формат для Home:
+        'primaryPosition': pos,
+        'positions': [pos],
+        // новое поле, которое пишет экран редактирования:
+        'position': pos,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+      return const PlayerProfile(
         name: 'Имя Фамилия',
-        primaryPosition: 'ST',
-        positions: const ['ST'],
-      );
-      await _doc(uid).set(defaultDto.toJson());
-      return PlayerProfile(
-        name: defaultDto.name,
         primaryPosition: Position.ST,
-        positions: const [Position.ST],
+        positions: [Position.ST],
       );
     }
 
-    final dto = PlayerProfileDto.fromJson(snap.data()!);
+    // --- ЧТЕНИЕ С УЧЁТОМ ОБОИХ ФОРМАТОВ ---
+    final name = (data['name'] ?? 'Имя Фамилия') as String;
+
+    // 1) новое поле 'position' (от экрана редактирования)
+    // 2) старое поле 'primaryPosition'
+    // 3) первый элемент из массива 'positions'
+    var posStr = (data['position'] ?? data['primaryPosition'] ?? '') as String;
+    if (posStr.isEmpty) {
+      final arr = data['positions'];
+      if (arr is List && arr.isNotEmpty && arr.first is String) {
+        posStr = arr.first as String;
+      }
+    }
+    if (posStr.isEmpty) posStr = 'ST';
+
+    final listRaw = (data['positions'] as List?)?.cast<String>() ?? <String>[posStr];
+    final positions = listRaw.map(_fromString).toList();
+
     return PlayerProfile(
-      name: dto.name,
-      primaryPosition: _fromString(dto.primaryPosition),
-      positions: dto.positions.map(_fromString).toList(),
+      name: name,
+      primaryPosition: _fromString(posStr),
+      positions: positions,
     );
   }
 
   @override
   Future<void> saveProfile(String uid, PlayerProfile profile) async {
-    final dto = PlayerProfileDto(
-      name: profile.name,
-      primaryPosition: _toString(profile.primaryPosition),
-      positions: profile.positions.map(_toString).toList(),
-    );
-    await _doc(uid).set(dto.toJson(), SetOptions(merge: true));
+    final primary = _toString(profile.primaryPosition);
+    final list = profile.positions.map(_toString).toList();
+
+    // Пишем и старые, и новые поля, чтобы оба экрана были счастливы.
+    await _doc(uid).set({
+      'name': profile.name,
+      // старый формат, который уже использует Home:
+      'primaryPosition': primary,
+      'positions': list,
+      // новое поле, которое использует экран редактирования:
+      'position': primary,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../core/app_theme.dart';
+import '../navigation/route_names.dart';
 
 class HomeBottomNav extends StatelessWidget {
   final int index;
@@ -47,9 +50,12 @@ class HomeBottomNav extends StatelessWidget {
             ),
             child: NavigationBar(
               selectedIndex: index,
-              onDestinationSelected: onChanged ?? (_) {},
               height: 64,
-              destinations: [
+              onDestinationSelected: (i) {
+                // Профиль: открываем просмотр профиля поверх текущего стека.
+                onChanged?.call(i);
+              },
+              destinations: const [
                 NavigationDestination(
                   icon: Icon(Icons.home_outlined, color: Colors.grey),
                   selectedIcon: Icon(Icons.home, color: AppColors.primary),

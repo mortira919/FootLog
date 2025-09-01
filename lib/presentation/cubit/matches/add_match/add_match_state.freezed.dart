@@ -28,6 +28,9 @@ mixin _$AddMatchState {
   String? get opponentId => throw _privateConstructorUsedError;
   String? get opponentLogoUrl => throw _privateConstructorUsedError;
   String? get yourLogoUrl =>
+      throw _privateConstructorUsedError; // флаги загрузки логотипов
+  bool get isUploadingYourLogo => throw _privateConstructorUsedError;
+  bool get isUploadingOpponentLogo =>
       throw _privateConstructorUsedError; // позицию В МАТЧЕ убрали
   FieldType get fieldType => throw _privateConstructorUsedError;
   Weather get weather =>
@@ -63,6 +66,8 @@ abstract class $AddMatchStateCopyWith<$Res> {
       String? opponentId,
       String? opponentLogoUrl,
       String? yourLogoUrl,
+      bool isUploadingYourLogo,
+      bool isUploadingOpponentLogo,
       FieldType fieldType,
       Weather weather,
       int myGoals,
@@ -98,6 +103,8 @@ class _$AddMatchStateCopyWithImpl<$Res, $Val extends AddMatchState>
     Object? opponentId = freezed,
     Object? opponentLogoUrl = freezed,
     Object? yourLogoUrl = freezed,
+    Object? isUploadingYourLogo = null,
+    Object? isUploadingOpponentLogo = null,
     Object? fieldType = null,
     Object? weather = null,
     Object? myGoals = null,
@@ -151,6 +158,14 @@ class _$AddMatchStateCopyWithImpl<$Res, $Val extends AddMatchState>
           ? _value.yourLogoUrl
           : yourLogoUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      isUploadingYourLogo: null == isUploadingYourLogo
+          ? _value.isUploadingYourLogo
+          : isUploadingYourLogo // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isUploadingOpponentLogo: null == isUploadingOpponentLogo
+          ? _value.isUploadingOpponentLogo
+          : isUploadingOpponentLogo // ignore: cast_nullable_to_non_nullable
+              as bool,
       fieldType: null == fieldType
           ? _value.fieldType
           : fieldType // ignore: cast_nullable_to_non_nullable
@@ -203,6 +218,8 @@ abstract class _$$AddMatchStateImplCopyWith<$Res>
       String? opponentId,
       String? opponentLogoUrl,
       String? yourLogoUrl,
+      bool isUploadingYourLogo,
+      bool isUploadingOpponentLogo,
       FieldType fieldType,
       Weather weather,
       int myGoals,
@@ -236,6 +253,8 @@ class __$$AddMatchStateImplCopyWithImpl<$Res>
     Object? opponentId = freezed,
     Object? opponentLogoUrl = freezed,
     Object? yourLogoUrl = freezed,
+    Object? isUploadingYourLogo = null,
+    Object? isUploadingOpponentLogo = null,
     Object? fieldType = null,
     Object? weather = null,
     Object? myGoals = null,
@@ -289,6 +308,14 @@ class __$$AddMatchStateImplCopyWithImpl<$Res>
           ? _value.yourLogoUrl
           : yourLogoUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      isUploadingYourLogo: null == isUploadingYourLogo
+          ? _value.isUploadingYourLogo
+          : isUploadingYourLogo // ignore: cast_nullable_to_non_nullable
+              as bool,
+      isUploadingOpponentLogo: null == isUploadingOpponentLogo
+          ? _value.isUploadingOpponentLogo
+          : isUploadingOpponentLogo // ignore: cast_nullable_to_non_nullable
+              as bool,
       fieldType: null == fieldType
           ? _value.fieldType
           : fieldType // ignore: cast_nullable_to_non_nullable
@@ -336,6 +363,8 @@ class _$AddMatchStateImpl implements _AddMatchState {
       this.opponentId,
       this.opponentLogoUrl,
       this.yourLogoUrl,
+      this.isUploadingYourLogo = false,
+      this.isUploadingOpponentLogo = false,
       this.fieldType = FieldType.natural,
       this.weather = Weather.sunny,
       this.myGoals = 0,
@@ -373,6 +402,13 @@ class _$AddMatchStateImpl implements _AddMatchState {
   final String? opponentLogoUrl;
   @override
   final String? yourLogoUrl;
+// флаги загрузки логотипов
+  @override
+  @JsonKey()
+  final bool isUploadingYourLogo;
+  @override
+  @JsonKey()
+  final bool isUploadingOpponentLogo;
 // позицию В МАТЧЕ убрали
   @override
   @JsonKey()
@@ -399,7 +435,7 @@ class _$AddMatchStateImpl implements _AddMatchState {
 
   @override
   String toString() {
-    return 'AddMatchState(saving: $saving, error: $error, date: $date, durationMin: $durationMin, yourTeam: $yourTeam, opponentTeam: $opponentTeam, yourGoals: $yourGoals, opponentGoals: $opponentGoals, opponentId: $opponentId, opponentLogoUrl: $opponentLogoUrl, yourLogoUrl: $yourLogoUrl, fieldType: $fieldType, weather: $weather, myGoals: $myGoals, myAssists: $myAssists, myInterceptions: $myInterceptions, myTackles: $myTackles, mySaves: $mySaves)';
+    return 'AddMatchState(saving: $saving, error: $error, date: $date, durationMin: $durationMin, yourTeam: $yourTeam, opponentTeam: $opponentTeam, yourGoals: $yourGoals, opponentGoals: $opponentGoals, opponentId: $opponentId, opponentLogoUrl: $opponentLogoUrl, yourLogoUrl: $yourLogoUrl, isUploadingYourLogo: $isUploadingYourLogo, isUploadingOpponentLogo: $isUploadingOpponentLogo, fieldType: $fieldType, weather: $weather, myGoals: $myGoals, myAssists: $myAssists, myInterceptions: $myInterceptions, myTackles: $myTackles, mySaves: $mySaves)';
   }
 
   @override
@@ -426,6 +462,11 @@ class _$AddMatchStateImpl implements _AddMatchState {
                 other.opponentLogoUrl == opponentLogoUrl) &&
             (identical(other.yourLogoUrl, yourLogoUrl) ||
                 other.yourLogoUrl == yourLogoUrl) &&
+            (identical(other.isUploadingYourLogo, isUploadingYourLogo) ||
+                other.isUploadingYourLogo == isUploadingYourLogo) &&
+            (identical(
+                    other.isUploadingOpponentLogo, isUploadingOpponentLogo) ||
+                other.isUploadingOpponentLogo == isUploadingOpponentLogo) &&
             (identical(other.fieldType, fieldType) ||
                 other.fieldType == fieldType) &&
             (identical(other.weather, weather) || other.weather == weather) &&
@@ -440,26 +481,29 @@ class _$AddMatchStateImpl implements _AddMatchState {
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      saving,
-      error,
-      date,
-      durationMin,
-      yourTeam,
-      opponentTeam,
-      yourGoals,
-      opponentGoals,
-      opponentId,
-      opponentLogoUrl,
-      yourLogoUrl,
-      fieldType,
-      weather,
-      myGoals,
-      myAssists,
-      myInterceptions,
-      myTackles,
-      mySaves);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        saving,
+        error,
+        date,
+        durationMin,
+        yourTeam,
+        opponentTeam,
+        yourGoals,
+        opponentGoals,
+        opponentId,
+        opponentLogoUrl,
+        yourLogoUrl,
+        isUploadingYourLogo,
+        isUploadingOpponentLogo,
+        fieldType,
+        weather,
+        myGoals,
+        myAssists,
+        myInterceptions,
+        myTackles,
+        mySaves
+      ]);
 
   /// Create a copy of AddMatchState
   /// with the given fields replaced by the non-null parameter values.
@@ -483,6 +527,8 @@ abstract class _AddMatchState implements AddMatchState {
       final String? opponentId,
       final String? opponentLogoUrl,
       final String? yourLogoUrl,
+      final bool isUploadingYourLogo,
+      final bool isUploadingOpponentLogo,
       final FieldType fieldType,
       final Weather weather,
       final int myGoals,
@@ -512,7 +558,11 @@ abstract class _AddMatchState implements AddMatchState {
   @override
   String? get opponentLogoUrl;
   @override
-  String? get yourLogoUrl; // позицию В МАТЧЕ убрали
+  String? get yourLogoUrl; // флаги загрузки логотипов
+  @override
+  bool get isUploadingYourLogo;
+  @override
+  bool get isUploadingOpponentLogo; // позицию В МАТЧЕ убрали
   @override
   FieldType get fieldType;
   @override

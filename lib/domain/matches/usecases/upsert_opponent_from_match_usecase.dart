@@ -10,6 +10,11 @@ class UpsertOpponentFromMatchUseCase {
         DateTime? playedAt,
         String? logoUrl,
       }) {
-    return _repo.upsertFromMatch(uid, name: name, playedAt: playedAt, logoUrl: logoUrl);
+    return _repo.upsertFromMatch(
+      uid,
+      name: name,
+      playedAt: playedAt,
+      logoUrl: logoUrl,
+    );
   }
 }

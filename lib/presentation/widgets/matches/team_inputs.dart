@@ -1,4 +1,3 @@
-// lib/presentation/widgets/matches/team_inputs.dart
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -31,31 +30,20 @@ class _TeamInputsState extends State<TeamInputs> {
     super.initState();
     _yourC = TextEditingController(text: widget.yourTeam);
     _oppC  = TextEditingController(text: widget.opponentTeam);
-
-    _yourC.addListener(() {
-      final cb = widget.onYourChanged;
-      if (cb != null) cb(_yourC.text);
-    });
-    _oppC.addListener(() {
-      final cb = widget.onOpponentChanged;
-      if (cb != null) cb(_oppC.text);
-    });
+    _yourC.addListener(() => widget.onYourChanged?.call(_yourC.text));
+    _oppC.addListener(() => widget.onOpponentChanged?.call(_oppC.text));
   }
 
   @override
   void didUpdateWidget(covariant TeamInputs oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    if (widget.yourTeam != oldWidget.yourTeam &&
-        widget.yourTeam != _yourC.text) {
+    if (widget.yourTeam != oldWidget.yourTeam && widget.yourTeam != _yourC.text) {
       _yourC.value = TextEditingValue(
         text: widget.yourTeam,
         selection: TextSelection.collapsed(offset: widget.yourTeam.length),
       );
     }
-
-    if (widget.opponentTeam != oldWidget.opponentTeam &&
-        widget.opponentTeam != _oppC.text) {
+    if (widget.opponentTeam != oldWidget.opponentTeam && widget.opponentTeam != _oppC.text) {
       _oppC.value = TextEditingValue(
         text: widget.opponentTeam,
         selection: TextSelection.collapsed(offset: widget.opponentTeam.length),
@@ -70,7 +58,6 @@ class _TeamInputsState extends State<TeamInputs> {
     super.dispose();
   }
 
-  // измеряем ширину текста с учётом текущего масштаба
   double _measure(BuildContext ctx, String text, TextStyle style) {
     final tp = TextPainter(
       text: TextSpan(text: text, style: style),
@@ -86,14 +73,12 @@ class _TeamInputsState extends State<TeamInputs> {
     final labelStyleForMeasure = TextStyle(
       fontSize: 17.sp, fontWeight: FontWeight.w400, height: 1.0, color: AppColors.black,
     );
-
-    // единая ширина колонки лейбла (адаптивная) для обеих строк
     final contentW = MediaQuery.of(context).size.width - 32.w; // padding карточки 16+16
     final maxTextW = math.max(
       _measure(context, 'Ваша', labelStyleForMeasure),
       _measure(context, 'Соперника', labelStyleForMeasure),
     );
-    final desired = maxTextW + 6.w; // плотный буфер к каретке
+    final desired = maxTextW + 6.w;
     final double labelColumnWidth = desired.clamp(72.w, contentW * 0.38);
 
     return Column(
@@ -119,7 +104,7 @@ class _TeamInputsState extends State<TeamInputs> {
 class _InlineLinedFieldCtrl extends StatelessWidget {
   final String label;
   final TextEditingController controller;
-  final double labelColumnWidth; // фиксированная (для обеих строк) ширина колонки лейбла
+  final double labelColumnWidth;
   final TextInputAction textInputAction;
 
   const _InlineLinedFieldCtrl({
@@ -131,7 +116,6 @@ class _InlineLinedFieldCtrl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // типографика: Regular 17, плотная посадка к линии
     final labelStyle = TextStyle(
       fontSize: 17.sp, fontWeight: FontWeight.w400, height: 1.0, color: AppColors.black,
     );
@@ -139,19 +123,18 @@ class _InlineLinedFieldCtrl extends StatelessWidget {
       fontSize: 17.sp, fontWeight: FontWeight.w400, height: 1.0, color: AppColors.black,
     );
     final hintStyle = inputStyle.copyWith(color: AppColors.labelGray30);
-
     final strut = StrutStyle(
       forceStrutHeight: true, height: 1.0,
       fontSize: inputStyle.fontSize, fontWeight: inputStyle.fontWeight, fontFamily: inputStyle.fontFamily,
     );
 
-    const double gap = 6; // плотный зазор лейбл ↔ каретка
+    const double gap = 6;
 
     return SizedBox(
-      height: 44.h, // вся строка 44, линия — внутри
+      height: 44.h,
       child: DecoratedBox(
         decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: AppColors.divider, width: 0)), // hairline
+          border: Border(bottom: BorderSide(color: AppColors.divider, width: 0)),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -163,16 +146,7 @@ class _InlineLinedFieldCtrl extends StatelessWidget {
                 alignment: Alignment.bottomLeft,
                 child: Padding(
                   padding: EdgeInsets.only(bottom: 1.h),
-                  child: Text(
-                    label,
-                    softWrap: false,
-                    overflow: TextOverflow.visible,
-                    style: labelStyle,
-                    textHeightBehavior: const TextHeightBehavior(
-                      applyHeightToFirstAscent: false,
-                      applyHeightToLastDescent: false,
-                    ),
-                  ),
+                  child: Text(label, style: labelStyle),
                 ),
               ),
             ),

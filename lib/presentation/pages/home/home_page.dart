@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:footlog/di/di.dart';
 
@@ -23,6 +22,10 @@ import 'package:footlog/presentation/cubit/home/home_state.dart';
 import 'package:footlog/presentation/navigation/app_router.dart';
 import 'package:footlog/presentation/navigation/route_names.dart';
 
+// ---- Профиль
+import 'package:footlog/presentation/cubit/profile/profile_cubit.dart';
+import 'package:footlog/presentation/pages/profile/profile_page.dart';
+
 import '../../widgets/bottom_nav.dart';
 import '../../widgets/profile/edit_profile_sheet.dart';
 import '../../widgets/profile/profile_card.dart';
@@ -39,6 +42,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _tabIndex = 0;
 
+  late final String _uid;
   late final StatsCubit _statsCubit;
   late final WellbeingCubit _wbCubit;
 
@@ -46,15 +50,14 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    final user = FirebaseAuth.instance.currentUser;
-    final uid = user?.uid ?? '';
+    _uid = FirebaseAuth.instance.currentUser?.uid ?? 'mock-uid';
 
     // Экран «Статистика»
-    _statsCubit = StatsCubit(getIt<StatsRepository>(), uid)..load(months: 6);
+    _statsCubit = StatsCubit(getIt<StatsRepository>(), _uid)..load(months: 6);
 
-    // Экран «Состояние» — один инстанс на всё время жизни HomePage
+    // Экран «Состояние»
     _wbCubit = WellbeingCubit(
-      uid: uid,
+      uid: _uid,
       repo: getIt<WellbeingRepository>(),
     )..load(DateTime.now());
   }
@@ -70,11 +73,9 @@ class _HomePageState extends State<HomePage> {
     // Центральная кнопка «Добавить матч»
     if (i == 2) {
       final saved = await context.push<bool>(RouteNames.matchesAdd);
-      if (!mounted) return; // сначала проверка
-      if (saved == true) {
-        context.read<HomeCubit>().load();
-      }
-      return; // не меняем выбранный таб
+      if (!mounted) return;
+      if (saved == true) context.read<HomeCubit>().load();
+      return; // не переключаем вкладку
     }
     setState(() => _tabIndex = i);
   }
@@ -99,7 +100,7 @@ class _HomePageState extends State<HomePage> {
         }
 
         final Widget content = switch (_tabIndex) {
-        // 0 — Главная
+        // 0 — Главная (карточки)
           0 => ListView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: EdgeInsets.all(16.w),
@@ -132,16 +133,19 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
 
-        // 1 — Экран «Статистика»
+        // 1 — Статистика
           1 => StatsPage(cubit: _statsCubit),
 
-        // 3 — Экран «Состояние»
-          3 => BlocProvider.value(
-            value: _wbCubit,
-            child: const WellbeingPage(),
+        // 3 — Состояние
+          3 => BlocProvider.value(value: _wbCubit, child: const WellbeingPage()),
+
+        // 4 — Профиль (ОБЗОР) — со встроенным нижним баром
+          4 => BlocProvider(
+            create: (_) => getIt<ProfileCubit>(param1: _uid)..load(),
+            child: const ProfilePage(),
           ),
 
-        // остальные — пока пусто
+        // прочее — пусто
           _ => const SizedBox.shrink(),
         };
 
