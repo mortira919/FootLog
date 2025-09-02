@@ -1,4 +1,3 @@
-// lib/presentation/pages/home/home_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,12 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:footlog/di/di.dart';
 
-// ---- Stats (экран «Статистика»)
+// ---- Stats
 import 'package:footlog/domain/stats/repositories/stats_repository.dart';
 import 'package:footlog/presentation/cubit/stats/stats_cubit.dart';
 import 'package:footlog/presentation/pages/stats/stats_page.dart';
 
-// ---- Wellbeing (экран «Состояние»)
+// ---- Wellbeing
 import 'package:footlog/domain/wellbeing/repositories/wellbeing_repository.dart';
 import 'package:footlog/presentation/cubit/wellbeing/wellbeing_cubit.dart';
 import 'package:footlog/presentation/pages/wellbeing/wellbeing_page.dart';
@@ -31,6 +30,9 @@ import '../../widgets/profile/edit_profile_sheet.dart';
 import '../../widgets/profile/profile_card.dart';
 import '../../widgets/profile/quick_stats.dart';
 import '../../widgets/profile/recent_matches.dart';
+
+// обёртка со встроенным CoachChat FAB
+import '../../widgets/page_scaffold.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -52,10 +54,8 @@ class _HomePageState extends State<HomePage> {
 
     _uid = FirebaseAuth.instance.currentUser?.uid ?? 'mock-uid';
 
-    // Экран «Статистика»
     _statsCubit = StatsCubit(getIt<StatsRepository>(), _uid)..load(months: 6);
 
-    // Экран «Состояние»
     _wbCubit = WellbeingCubit(
       uid: _uid,
       repo: getIt<WellbeingRepository>(),
@@ -70,12 +70,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _onTabChanged(int i) async {
-    // Центральная кнопка «Добавить матч»
+    // центральная кнопка "Добавить матч"
     if (i == 2) {
       final saved = await context.push<bool>(RouteNames.matchesAdd);
       if (!mounted) return;
       if (saved == true) context.read<HomeCubit>().load();
-      return; // не переключаем вкладку
+      return;
     }
     setState(() => _tabIndex = i);
   }
@@ -100,7 +100,7 @@ class _HomePageState extends State<HomePage> {
         }
 
         final Widget content = switch (_tabIndex) {
-        // 0 — Главная (карточки)
+        // 0 — Главная
           0 => ListView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: EdgeInsets.all(16.w),
@@ -139,25 +139,25 @@ class _HomePageState extends State<HomePage> {
         // 3 — Состояние
           3 => BlocProvider.value(value: _wbCubit, child: const WellbeingPage()),
 
-        // 4 — Профиль (ОБЗОР) — со встроенным нижним баром
+        // 4 — Профиль
           4 => BlocProvider(
             create: (_) => getIt<ProfileCubit>(param1: _uid)..load(),
             child: const ProfilePage(),
           ),
 
-        // прочее — пусто
           _ => const SizedBox.shrink(),
         };
 
-        return Scaffold(
+        // Обёртка с FAB тренера
+        return PageScaffold(
           body: SafeArea(child: content),
-          bottomSheet: (s.loading && s.profile != null)
-              ? const LinearProgressIndicator(minHeight: 2)
-              : null,
           bottomNavigationBar: HomeBottomNav(
             index: _tabIndex,
             onChanged: _onTabChanged,
           ),
+          showCoachFab: const {0, 1, 3, 4}.contains(_tabIndex),
+
+          // topProgress: (s.loading && s.profile != null), // если нужен тонкий индикатор сверху
         );
       },
     );

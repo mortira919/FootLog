@@ -1,12 +1,11 @@
+// lib/presentation/widgets/wellbeing/mood_card.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:footlog/core/app_theme.dart';
-import 'package:footlog/domain/wellbeing/entities/wellbeing_entry.dart';
 import 'package:footlog/presentation/cubit/wellbeing/wellbeing_cubit.dart';
 import 'package:footlog/presentation/cubit/wellbeing/wellbeing_state.dart';
-
+import '../../../domain/wellbeing/entities/wellbeing_entry.dart';
 import 'shared.dart';
 
 class MoodCard extends StatefulWidget {
@@ -24,8 +23,12 @@ class _MoodCardState extends State<MoodCard> {
   @override
   void didUpdateWidget(covariant MoodCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.state.moodBefore != widget.state.moodBefore) _before = widget.state.moodBefore;
-    if (oldWidget.state.moodAfter  != widget.state.moodAfter ) _after  = widget.state.moodAfter;
+    if (oldWidget.state.moodBefore != widget.state.moodBefore) {
+      _before = widget.state.moodBefore;
+    }
+    if (oldWidget.state.moodAfter  != widget.state.moodAfter ) {
+      _after  = widget.state.moodAfter;
+    }
   }
 
   @override
@@ -34,9 +37,15 @@ class _MoodCardState extends State<MoodCard> {
 
     return WellCard(
       title: 'Настроение',
+      titleStyle: TextStyle(
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w700,
+        color: Colors.black,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // по центру, как в макете
           const SubTitle('Настроение до матча'),
           SizedBox(height: 6.h),
           MoodRow(selected: _before, onChanged: (m) => setState(() => _before = m)),
@@ -49,6 +58,7 @@ class _MoodCardState extends State<MoodCard> {
             ),
           ),
           SizedBox(height: 16.h),
+
           const SubTitle('Настроение после матча'),
           SizedBox(height: 6.h),
           MoodRow(selected: _after, onChanged: (m) => setState(() => _after = m)),

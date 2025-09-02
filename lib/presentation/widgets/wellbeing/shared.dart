@@ -1,4 +1,3 @@
-// lib/presentation/widgets/wellbeing/shared.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -10,7 +9,13 @@ import 'package:footlog/domain/wellbeing/entities/wellbeing_entry.dart';
 class WellCard extends StatelessWidget {
   final String title;
   final Widget child;
-  const WellCard({super.key, required this.title, required this.child});
+  final TextStyle? titleStyle;
+  const WellCard({
+    super.key,
+    required this.title,
+    required this.child,
+    this.titleStyle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +27,12 @@ class WellCard extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w700),
+            style: titleStyle ??
+                TextStyle(
+                  fontSize: 16.sp,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
           ),
           SizedBox(height: 8.h),
           child,
@@ -41,16 +51,13 @@ class SubTitle extends StatelessWidget {
     return Text(
       text,
       textAlign: TextAlign.center,
-      style: TextStyle(
-        fontSize: 13.sp,
-        fontWeight: FontWeight.w600,
-        color: Colors.black54,
-      ),
+      style:
+      TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w600, color: Colors.black),
     );
   }
 }
 
-/// ===== Настроение: сегменты
+/// ===== Настроение: сегменты (PNG-иконки iOS)
 
 class MoodRow extends StatelessWidget {
   final Mood selected;
@@ -89,9 +96,7 @@ class MoodRow extends StatelessWidget {
                 child: SizedBox(
                   width: 1,
                   height: 22,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(color: sepCol),
-                  ),
+                  child: DecoratedBox(decoration: BoxDecoration(color: sepCol)),
                 ),
               ),
           ],
@@ -129,9 +134,31 @@ class _MoodSegment extends StatelessWidget {
               : const [],
           border: selected ? Border.all(color: Color(0xFFE5E7EB)) : null,
         ),
-        child: Text(moodEmoji(mood), style: const TextStyle(fontSize: 22)),
+        child: Image.asset(
+          moodAsset(mood),
+          width: 24.w,
+          height: 24.w,
+          fit: BoxFit.contain,
+          filterQuality: FilterQuality.high,
+          errorBuilder: (_, __, ___) =>
+          const Text('🙂', style: TextStyle(fontSize: 22)),
+        ),
       ),
     );
+  }
+}
+
+String moodAsset(Mood m) {
+  const base = 'assets/icons/';
+  switch (m) {
+    case Mood.bad:
+      return '${base}plox.png';
+    case Mood.neutral:
+      return '${base}norm.png';
+    case Mood.good:
+      return '${base}harosh.png';
+    case Mood.veryGood:
+      return '${base}otlich.png';
   }
 }
 
@@ -148,7 +175,7 @@ String moodEmoji(Mood m) {
   }
 }
 
-/// ===== Слайдер энергии (PNG-иконки слева/справа, белый пин)
+/// ===== Слайдер энергии и остальное
 
 class EnergySlider extends StatelessWidget {
   final int value; // 0..10
@@ -191,10 +218,8 @@ class EnergySlider extends StatelessWidget {
 class _ShadowThumbShape extends SliderComponentShape {
   final double radius;
   const _ShadowThumbShape({this.radius = 12});
-
   @override
   Size getPreferredSize(bool isEnabled, bool isDiscrete) => Size.fromRadius(radius);
-
   @override
   void paint(
       PaintingContext context,
@@ -223,12 +248,9 @@ class _ShadowThumbShape extends SliderComponentShape {
   }
 }
 
-/// ===== Общий «трек» 329×28 и сегменты качества (Хорошо | Средне | Плохо)
-
 class _TrackWidth extends StatelessWidget {
   final Widget child;
   const _TrackWidth({required this.child});
-
   @override
   Widget build(BuildContext context) {
     return Align(
@@ -260,10 +282,11 @@ class TrackSegmented<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final index = items.indexWhere((e) => e.value == value).clamp(0, items.length - 1);
+    final index =
+    items.indexWhere((e) => e.value == value).clamp(0, items.length - 1);
     final trackH = 28.h;
     final pillH = 24.h;
-    final trackR = 7.r;  // как в макете
+    final trackR = 7.r;
     final pillR = 6.r;
 
     final textSel = TextStyle(
@@ -289,7 +312,6 @@ class TrackSegmented<T> extends StatelessWidget {
 
             return Stack(
               children: [
-                // трек + разделители
                 Container(
                   decoration: BoxDecoration(
                     color: const Color(0xFFF2F3F5),
@@ -307,7 +329,6 @@ class TrackSegmented<T> extends StatelessWidget {
                     }),
                   ),
                 ),
-                // активная «пилюля»
                 Positioned(
                   top: (trackH - pillH) / 2,
                   left: index * segW + 4.w,
@@ -318,12 +339,11 @@ class TrackSegmented<T> extends StatelessWidget {
                       color: AppColors.white,
                       borderRadius: BorderRadius.circular(pillR),
                       boxShadow: const [
-                        BoxShadow(color: Color(0x1A000000), blurRadius: 8, offset: Offset(0, 2)),
+                        BoxShadow(color: Color(0x1A000000), blurRadius: 8, offset: Offset(0, 2))
                       ],
                     ),
                   ),
                 ),
-                // кликабельные сегменты с подписями
                 Row(
                   children: [
                     for (int i = 0; i < items.length; i++)
@@ -374,8 +394,6 @@ class QualitySegmented extends StatelessWidget {
   }
 }
 
-/// ===== чек-ряд для «Травмы и дискомфорт»
-
 class CheckRow extends StatelessWidget {
   final String label;
   final bool value;
@@ -398,7 +416,12 @@ class CheckRow extends StatelessWidget {
         padding: EdgeInsets.symmetric(vertical: 6.h, horizontal: 4.w),
         child: Row(
           children: [
-            Expanded(child: Text(label, style: textStyle)),
+            Expanded(
+              child: Text(
+                label,
+                style: textStyle ?? const TextStyle(color: Colors.black),
+              ),
+            ),
             Container(
               width: 22.w,
               height: 22.w,
@@ -419,8 +442,6 @@ class CheckRow extends StatelessWidget {
     );
   }
 }
-
-/// ===== форматтер длительности
 
 String formatDurationRu(Duration d) {
   final h = d.inHours;

@@ -27,8 +27,14 @@ class ProfilePage extends StatelessWidget {
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Профиль'),
+            title: const Text(
+              'Профиль',
+              style: TextStyle(color: Colors.black),
+            ),
             centerTitle: true,
+            iconTheme: const IconThemeData(color: Colors.black),
+            backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+            elevation: 0,
           ),
           body: s.loading
               ? const Center(child: CircularProgressIndicator())
@@ -47,6 +53,7 @@ class ProfilePage extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16.sp,
                         fontWeight: FontWeight.w700,
+                        color: Colors.black,
                       ),
                     ),
                     SizedBox(height: 10.h),
@@ -93,43 +100,43 @@ class ProfilePage extends StatelessWidget {
 
               SizedBox(height: 12.h),
 
-              // ===== Настройки =====
+              // ===== Настройки (без нижних линий, чистый чёрный текст) =====
               AppCard(
-                padding: EdgeInsets.all(8.w),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Padding(
-                      padding: EdgeInsets.only(top: 6.h, bottom: 4.h),
-                      child: Text(
-                        'Настройки',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w700,
-                        ),
+                    Text(
+                      'Настройки',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 22.sp,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.black,
                       ),
                     ),
-                    ListTile(
-                      dense: true,
-                      title: const Text('Язык приложения'),
-                      trailing: const Text('Русский'),
-                      onTap: () {}, // TODO
+                    SizedBox(height: 12.h),
+
+                    _SettingsRow(
+                      title: 'Язык приложения',
+                      value: 'Русский',
+                      onTap: () {
+                        // TODO: выбор языка
+                      },
                     ),
-                    const Divider(height: 1),
-                    ListTile(
-                      dense: true,
-                      title: const Text('Цветовая тема'),
-                      trailing: const Text('Светлая'),
-                      onTap: () {}, // TODO
+                    SizedBox(height: 8.h),
+
+                    _SettingsRow(
+                      title: 'Цветовая тема',
+                      value: 'Светлая',
+                      onTap: () {
+                        // TODO: выбор темы
+                      },
                     ),
-                    const Divider(height: 1),
-                    ListTile(
-                      dense: true,
-                      title: const Text(
-                        'Выйти из аккаунта',
-                        style: TextStyle(color: Colors.red),
-                      ),
+
+                    SizedBox(height: 16.h),
+
+                    _LogoutRow(
                       onTap: () async {
                         final confirm = await showDialog<bool>(
                           context: context,
@@ -203,9 +210,18 @@ class ProfilePage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Expanded(child: Text(l, style: const TextStyle(color: Colors.black54))),
+          Expanded(
+            child: Text(
+              l,
+              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w400),
+            ),
+          ),
           const SizedBox(width: 8),
-          Text(r, textAlign: TextAlign.right, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(
+            r,
+            textAlign: TextAlign.right,
+            style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.black),
+          ),
         ],
       ),
     );
@@ -242,4 +258,76 @@ class ProfilePage extends StatelessWidget {
   }
 
   static String _footRu(String f) => f == 'left' ? 'Левая' : 'Правая';
+}
+
+class _SettingsRow extends StatelessWidget {
+  final String title;
+  final String value;
+  final VoidCallback? onTap;
+
+  const _SettingsRow({
+    required this.title,
+    required this.value,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final titleStyle = TextStyle(
+      fontSize: 16.sp,
+      fontWeight: FontWeight.w400,
+      color: Colors.black,
+    );
+    final valueStyle = TextStyle(
+      fontSize: 16.sp,
+      fontWeight: FontWeight.w600,
+      color: Colors.black,
+    );
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12.r),
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 12.h),
+        child: Row(
+          children: [
+            Expanded(child: Text(title, style: titleStyle)),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(value, style: valueStyle),
+                SizedBox(width: 8.w),
+                Icon(Icons.chevron_right, size: 20.sp, color: Colors.black),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LogoutRow extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _LogoutRow({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12.r),
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: 12.h),
+        child: Text(
+          'Выйти из аккаунта',
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 16.sp,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
 }
