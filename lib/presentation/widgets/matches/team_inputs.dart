@@ -1,3 +1,4 @@
+// lib/presentation/widgets/matches/team_inputs.dart
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -73,6 +74,7 @@ class _TeamInputsState extends State<TeamInputs> {
     final labelStyleForMeasure = TextStyle(
       fontSize: 17.sp, fontWeight: FontWeight.w400, height: 1.0, color: AppColors.black,
     );
+
     final contentW = MediaQuery.of(context).size.width - 32.w; // padding карточки 16+16
     final maxTextW = math.max(
       _measure(context, 'Ваша', labelStyleForMeasure),
@@ -81,6 +83,8 @@ class _TeamInputsState extends State<TeamInputs> {
     final desired = maxTextW + 6.w;
     final double labelColumnWidth = desired.clamp(72.w, contentW * 0.38);
 
+    final double hairline = 1 / MediaQuery.of(context).devicePixelRatio; // 1px линия
+
     return Column(
       children: [
         _InlineLinedFieldCtrl(
@@ -88,6 +92,8 @@ class _TeamInputsState extends State<TeamInputs> {
           controller: _yourC,
           labelColumnWidth: labelColumnWidth,
           textInputAction: TextInputAction.next,
+          hairline: hairline,
+          bottomInset: 12.h, // расстояние от текста до линии
         ),
         SizedBox(height: 10.h),
         _InlineLinedFieldCtrl(
@@ -95,6 +101,8 @@ class _TeamInputsState extends State<TeamInputs> {
           controller: _oppC,
           labelColumnWidth: labelColumnWidth,
           textInputAction: TextInputAction.done,
+          hairline: hairline,
+          bottomInset: 12.h,
         ),
       ],
     );
@@ -106,12 +114,16 @@ class _InlineLinedFieldCtrl extends StatelessWidget {
   final TextEditingController controller;
   final double labelColumnWidth;
   final TextInputAction textInputAction;
+  final double hairline;
+  final double bottomInset;
 
   const _InlineLinedFieldCtrl({
     required this.label,
     required this.controller,
     required this.labelColumnWidth,
     required this.textInputAction,
+    required this.hairline,
+    this.bottomInset = 12,
   });
 
   @override
@@ -128,49 +140,60 @@ class _InlineLinedFieldCtrl extends StatelessWidget {
       fontSize: inputStyle.fontSize, fontWeight: inputStyle.fontWeight, fontFamily: inputStyle.fontFamily,
     );
 
-    const double gap = 6;
+    final double gap = 6.w;
 
     return SizedBox(
-      height: 44.h,
-      child: DecoratedBox(
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: AppColors.divider, width: 0)),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            SizedBox(
-              width: labelColumnWidth,
-              child: Align(
-                alignment: Alignment.bottomLeft,
-                child: Padding(
-                  padding: EdgeInsets.only(bottom: 1.h),
-                  child: Text(label, style: labelStyle),
+      height: 56.h, // больше «воздуха», как в макете
+      child: Stack(
+        children: [
+          // разделительная линия (1px)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(height: hairline, color: const Color(0x4A3C3C43)),
+          ),
+          // контент с отступом от линии
+          Padding(
+            padding: EdgeInsets.only(bottom: bottomInset),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                SizedBox(
+                  width: labelColumnWidth,
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 1.h),
+                      child: Text(label, style: labelStyle),
+                    ),
+                  ),
                 ),
-              ),
+                SizedBox(width: gap),
+                Expanded(
+                  child: TextFormField(
+                    controller: controller,
+                    textInputAction: textInputAction,
+                    cursorColor: AppColors.primary,
+                    style: inputStyle,
+                    strutStyle: strut,
+                    textAlignVertical: TextAlignVertical.bottom,
+                    decoration: const InputDecoration(
+                      isCollapsed: true,
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      hintText: 'Название',
+                      contentPadding: EdgeInsets.zero,
+                    ).copyWith(hintStyle: hintStyle),
+                    autocorrect: false,
+                  ),
+                ),
+              ],
             ),
-            SizedBox(width: gap.w),
-            Expanded(
-              child: TextFormField(
-                controller: controller,
-                textInputAction: textInputAction,
-                cursorColor: AppColors.primary,
-                style: inputStyle,
-                strutStyle: strut,
-                textAlignVertical: TextAlignVertical.bottom,
-                decoration: const InputDecoration(
-                  isCollapsed: true,
-                  border: InputBorder.none,
-                  enabledBorder: InputBorder.none,
-                  focusedBorder: InputBorder.none,
-                  hintText: 'Название',
-                  contentPadding: EdgeInsets.only(bottom: 1),
-                ).copyWith(hintStyle: hintStyle),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // те же приёмы, что и на регистрации
+    // ===== адаптация по макету =====
     const designBlockHeight = 460.0;
     final safeTop  = MediaQuery.of(context).padding.top;
     final topTitle = 102.h; // отступ до заголовка по макету
@@ -54,174 +54,208 @@ class _LoginPageState extends State<LoginPage> {
     final titleStyle =
     factor < 0.95 ? AppText.h1.copyWith(fontSize: 30.sp) : AppText.h1;
 
-    return Scaffold(
-      body: BlocConsumer<AuthCubit, AuthState>(
-        listener: (context, state) {
-          state.maybeWhen(
-            authenticated: (_) {
-              // TODO: когда появится Home — заменить на context.go(Routes.home)
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Вход выполнен')),
-              );
-            },
-            error: (msg) => ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(msg))),
-            orElse: () {},
-          );
-        },
-        builder: (context, state) {
-          final loading =
-          state.maybeWhen(loading: () => true, orElse: () => false);
+    // ===== локальная тема для полей и кнопок =====
+    final localTheme = Theme.of(context).copyWith(
+      // убираем Underline у TextField и задаём заливку
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: const BorderSide(color: Color(0xFFE5E7EB), width: 1),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.2),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12.r),
+          borderSide: const BorderSide(color: Color(0xFFFF3B30), width: 1),
+        ),
+      ),
+      // глобально убираем серый overlay у TextButton
+      textButtonTheme: const TextButtonThemeData(
+        style: ButtonStyle(
+          overlayColor: MaterialStatePropertyAll(Colors.transparent),
+          backgroundColor: MaterialStatePropertyAll(Colors.transparent),
+          padding: MaterialStatePropertyAll(EdgeInsets.zero),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+      ),
+    );
 
-          final content = Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Заголовок
-              Padding(
-                padding: EdgeInsets.only(
-                  top: safeTop + topTitle,
-                  left: 51.5.w,
-                  right: 51.5.w,
-                ),
+    return Theme(
+      data: localTheme,
+      child: Scaffold(
+        body: BlocConsumer<AuthCubit, AuthState>(
+          listener: (context, state) {
+            state.maybeWhen(
+              authenticated: (_) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Вход выполнен')),
+                );
+              },
+              error: (msg) => ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(msg))),
+              orElse: () {},
+            );
+          },
+          builder: (context, state) {
+            final loading =
+            state.maybeWhen(loading: () => true, orElse: () => false);
 
-                child: FittedBox(
-                  // гарантируем одну строку, как в фигме
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'С возвращением!',
-                    style: titleStyle,
-                    softWrap: false,
-                    maxLines: 1,
-                    overflow: TextOverflow.visible,
+            final content = Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Заголовок
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: safeTop + topTitle,
+                    left: 51.5.w,
+                    right: 51.5.w,
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'С возвращением!',
+                      style: titleStyle,
+                      softWrap: false,
+                      maxLines: 1,
+                      overflow: TextOverflow.visible,
+                    ),
                   ),
                 ),
-              ),
 
-              SizedBox(height: 16.h),
+                SizedBox(height: 16.h),
 
-              // Поля и кнопки
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    AppTextField(
-                      hint: 'Email',
-                      controller: _emailC,
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    SizedBox(height: 8.h),
-                    PasswordField(
-                      controller: _passC,
-                      hint: 'Пароль',
-                      textInputAction: TextInputAction.done,
-                    ),
-                    SizedBox(height: 8.h),
+                // Поля и кнопки
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AppTextField(
+                        hint: 'Email',
+                        controller: _emailC,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      SizedBox(height: 8.h),
+                      PasswordField(
+                        controller: _passC,
+                        hint: 'Пароль',
+                        textInputAction: TextInputAction.done,
+                      ),
+                      SizedBox(height: 8.h),
 
-                    // Забыли пароль?
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        onPressed: () => context.go(Routes.forgot),
-                        child: Text(
-                          'Забыли пароль?',
-                          style: AppText.link,
+                      // Забыли пароль?
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton(
+                          onPressed: () => context.go(Routes.forgot),
+                          child: Text('Забыли пароль?', style: AppText.link),
                         ),
                       ),
-                    ),
 
-                    SizedBox(height: vh(8)),
+                      SizedBox(height: vh(8)),
 
-                    SizedBox(
-                      height: vh(52),
-                      child: PrimaryButton(
-                        label: 'Войти',
-                        onPressed: loading ? null : () => _onLogin(context),
+                      SizedBox(
+                        height: vh(52),
+                        child: PrimaryButton(
+                          label: 'Войти',
+                          onPressed: loading ? null : () => _onLogin(context),
+                        ),
                       ),
-                    ),
 
-                    SizedBox(height: vh(8)),
+                      SizedBox(height: vh(8)),
 
-                    Text.rich(
-                      TextSpan(
-                        text: 'Продолжая, вы принимаете ',
-                        style: AppText.body,
-                        children: [
-                          TextSpan(text: 'условия сервиса', style: AppText.link),
-                          const TextSpan(text: ' и '),
-                          TextSpan(
-                            text: 'политику конфиденциальности',
-                            style: AppText.link,
-                          ),
-                        ],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-
-                    SizedBox(height: vh(16)),
-                    const DividerWithLabel('Или'),
-                    SizedBox(height: vh(8)),
-
-                    SizedBox(
-                      height: vh(52),
-                      child: GoogleButton(
-                        label: 'Войти',
-                        onPressed: loading
-                            ? null
-                            : () => context.read<AuthCubit>().signInWithGoogle(),
-                      ),
-                    ),
-
-                    SizedBox(height: vh(16)),
-
-                    // «Ещё нет аккаунта? Создать»
-                    TextButton(
-                      onPressed: () => context.go(Routes.register),
-                      child: Text.rich(
+                      Text.rich(
                         TextSpan(
-                          text: 'Ещё нет аккаунта? ',
-                          style:
-                          AppText.body.copyWith(color: AppColors.black),
+                          text: 'Продолжая, вы принимаете ',
+                          style: AppText.body,
                           children: [
-                            TextSpan(text: 'Создать', style: AppText.link),
+                            TextSpan(
+                                text: 'условия сервиса', style: AppText.link),
+                            const TextSpan(text: ' и '),
+                            TextSpan(
+                              text: 'политику конфиденциальности',
+                              style: AppText.link,
+                            ),
                           ],
                         ),
                         textAlign: TextAlign.center,
                       ),
-                    ),
 
-                    SizedBox(height: vh(8)),
-                  ],
-                ),
-              ),
-            ],
-          );
+                      SizedBox(height: vh(16)),
+                      const DividerWithLabel('Или'),
+                      SizedBox(height: vh(8)),
 
-          return SafeArea(
-            top: false,
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SingleChildScrollView(
-                  physics: constraints.maxHeight >
-                      (safeTop + topTitle + designBlockHeight.h * 0.95)
-                      ? const NeverScrollableScrollPhysics()
-                      : const BouncingScrollPhysics(),
-                  padding: EdgeInsets.only(bottom: 16.h),
-                  child: ConstrainedBox(
-                    constraints:
-                    BoxConstraints(minHeight: constraints.maxHeight),
-                    child: IntrinsicHeight(child: content),
+                      SizedBox(
+                        height: vh(52),
+                        child: GoogleButton(
+                          label: 'Войти',
+                          onPressed: loading
+                              ? null
+                              : () => context
+                              .read<AuthCubit>()
+                              .signInWithGoogle(),
+                        ),
+                      ),
+
+                      SizedBox(height: vh(16)),
+
+                      // «Ещё нет аккаунта? Создать»
+                      Center(
+                        child: TextButton(
+                          onPressed: () => context.go(Routes.register),
+                          child: Text.rich(
+                            TextSpan(
+                              text: 'Ещё нет аккаунта? ',
+                              style: AppText.body
+                                  .copyWith(color: AppColors.black),
+                              children: [
+                                TextSpan(
+                                    text: 'Создать', style: AppText.link),
+                              ],
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: vh(8)),
+                    ],
                   ),
-                );
-              },
-            ),
-          );
-        },
+                ),
+              ],
+            );
+
+            return SafeArea(
+              top: false,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    physics: constraints.maxHeight >
+                        (safeTop + topTitle + designBlockHeight.h * 0.95)
+                        ? const NeverScrollableScrollPhysics()
+                        : const BouncingScrollPhysics(),
+                    padding: EdgeInsets.only(bottom: 16.h),
+                    child: ConstrainedBox(
+                      constraints:
+                      BoxConstraints(minHeight: constraints.maxHeight),
+                      child: IntrinsicHeight(child: content),
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
       ),
     );
   }

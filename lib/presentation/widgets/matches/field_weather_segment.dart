@@ -162,6 +162,12 @@ class _TrackSegmented<T> extends StatelessWidget {
                       height: trackH,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(trackR),
+                        // отключаем overlay/риппл/хайлайт при нажатии
+                        splashFactory: NoSplash.splashFactory,
+                        overlayColor: const MaterialStatePropertyAll(Colors.transparent),
+                        highlightColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        focusColor: Colors.transparent,
                         onTap: () => onChanged(items[i].value),
                         child: Center(
                           child: Padding(
