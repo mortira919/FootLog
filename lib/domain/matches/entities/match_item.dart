@@ -6,29 +6,26 @@ import 'package:footlog/domain/matches/enums/weather.dart';
 class MatchItem {
   final String? id;
 
-  /// URL логотипа вашей команды. Может быть null.
   final String? yourLogoUrl;
 
-  /// URL логотипа соперника. Может быть null.
   final String? opponentLogoUrl;
 
-  // ===== базовые поля матча =====
-  final DateTime date;            // начало матча
-  final int durationMin;          // 10..180
-  final String yourTeam;          // до 40
-  final String opponentTeam;      // до 40
-  final int yourGoals;            // 0..999
-  final int opponentGoals;        // 0..999
+  final DateTime date;
+  final int durationMin;
+  final String yourTeam;
+  final String opponentTeam;
+  final int yourGoals;
+  final int opponentGoals;
   final FieldType fieldType;
   final Weather weather;
   final Outcome outcome;
 
-  // ===== личная статистика игрока (по умолчанию 0) =====
-  final int? myGoals;         // забито голов
-  final int? myAssists;       // ассисты
-  final int? myTackles;       // отборы
-  final int? myInterceptions; // перехваты
-  final int? mySaves;         // сейвы
+
+  final int? myGoals;
+  final int? myAssists;
+  final int? myTackles;
+  final int? myInterceptions;
+  final int? mySaves;
 
   const MatchItem({
     this.id,
@@ -90,7 +87,7 @@ class MatchItem {
     );
   }
 
-  /// Для записи в Firestore
+
   Map<String, dynamic> toMap() => {
     'date': Timestamp.fromDate(date),
     'durationMin': durationMin,
@@ -104,7 +101,7 @@ class MatchItem {
     if (yourLogoUrl != null) 'yourLogoUrl': yourLogoUrl,
     if (opponentLogoUrl != null) 'opponentLogoUrl': opponentLogoUrl,
 
-    // личная статистика (null не пишем)
+
     if (myGoals != null) 'myGoals': myGoals,
     if (myAssists != null) 'myAssists': myAssists,
     if (myTackles != null) 'myTackles': myTackles,
@@ -112,7 +109,7 @@ class MatchItem {
     if (mySaves != null) 'mySaves': mySaves,
   };
 
-  /// Для чтения из Firestore (Map)
+
   factory MatchItem.fromMap(Map<String, dynamic> m, {String? id}) {
     final dynamic rawDate = m['date'];
     final DateTime parsedDate = rawDate is Timestamp
@@ -145,7 +142,7 @@ class MatchItem {
     );
   }
 
-  /// Удобно, если читаешь `DocumentSnapshot`
+
   factory MatchItem.fromDoc(DocumentSnapshot<Map<String, dynamic>> doc) =>
       MatchItem.fromMap(doc.data()!, id: doc.id);
 }

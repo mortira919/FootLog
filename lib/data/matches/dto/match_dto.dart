@@ -12,11 +12,11 @@ class MatchDto {
   final String weather;
   final String outcome;
 
-  // 👇 ЛОГОТИПЫ
+
   final String? yourLogoUrl;
   final String? opponentLogoUrl;
 
-  // личная статистика
+
   final int myGoals;
   final int myAssists;
   final int myTackles;
@@ -53,7 +53,7 @@ class MatchDto {
     int _i(dynamic v) => v is num ? v.toInt() : 0;
     String _s(dynamic v) => (v is String) ? v : (v ?? '').toString();
 
-    // приводим к Timestamp для единообразия
+
     final ts = j['date'] is Timestamp
         ? j['date'] as Timestamp
         : Timestamp.fromDate(_date(j['date']));
@@ -89,7 +89,7 @@ class MatchDto {
     'fieldType': fieldType,
     'weather': weather,
     'outcome': outcome,
-    // 👇 ОБА URL СКЛАДЫВАЕМ
+
     if (yourLogoUrl != null) 'yourLogoUrl': yourLogoUrl,
     if (opponentLogoUrl != null) 'opponentLogoUrl': opponentLogoUrl,
     'myGoals': myGoals,

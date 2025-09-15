@@ -56,7 +56,7 @@ class WellbeingPage extends StatelessWidget {
               NutritionCard(state: s),
               SizedBox(height: 12.h),
 
-              // ⬇️ Обсудить с ассистентом — открываем/создаём чат и переходим на экран
+
               InjuryCard(
                 state: s,
                 onAskCoach: () async {
@@ -68,8 +68,8 @@ class WellbeingPage extends StatelessWidget {
                         settings: const RouteSettings(name: '/coach-chat'),
                       ),
                     );
-                    // Если пользуешься GoRouter, то можно так:
-                    // context.push('/coach-chat', extra: chatId);
+
+
                   }
                 },
               ),
@@ -88,8 +88,8 @@ class WellbeingPage extends StatelessWidget {
     );
   }
 
-  /// Находит существующий чат «Диалог с тренером» для текущего пользователя
-  /// или создаёт новый и возвращает его id.
+
+
   static Future<String> _ensureCoachChat() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid == null) {
@@ -97,7 +97,7 @@ class WellbeingPage extends StatelessWidget {
     }
 
     final db = FirebaseFirestore.instance;
-    // Ищем чат этого пользователя по названию (как в твоих данных)
+
     final q = await db
         .collection('chats')
         .where('participants', arrayContains: uid)
@@ -109,7 +109,7 @@ class WellbeingPage extends StatelessWidget {
       return q.docs.first.id;
     }
 
-    // Если нет — создаём
+
     final doc = await db.collection('chats').add({
       'participants': [uid],
       'title': 'Диалог с тренером',

@@ -41,7 +41,7 @@ class ProfilePage extends StatelessWidget {
               : ListView(
             padding: EdgeInsets.all(16.w),
             children: [
-              // ===== Основная информация =====
+
               AppCard(
                 padding: EdgeInsets.all(14.w),
                 child: Column(
@@ -100,7 +100,7 @@ class ProfilePage extends StatelessWidget {
 
               SizedBox(height: 12.h),
 
-              // ===== Настройки (без нижних линий, чистый чёрный текст) =====
+
               AppCard(
                 padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                 child: Column(
@@ -158,12 +158,12 @@ class ProfilePage extends StatelessWidget {
                             false;
                         if (!confirm) return;
 
-                        // 1) Показываем лоадер на РУТОВОМ навигаторе
+
                         final rootCtx = rootNavigatorKey.currentContext ?? context;
                         bool loaderShown = false;
                         if (rootCtx.mounted) {
                           loaderShown = true;
-                          // ignore: use_build_context_synchronously
+
                           showDialog(
                             context: rootCtx,
                             barrierDismissible: false,
@@ -173,7 +173,7 @@ class ProfilePage extends StatelessWidget {
 
                         try {
                           await GetIt.I<LogoutUseCase>().call();
-                          // GoRouter по authStateChanges сам редиректит на /login
+
                         } catch (e) {
                           final scCtx = rootNavigatorKey.currentContext ?? context;
                           if (scCtx.mounted) {
@@ -185,7 +185,7 @@ class ProfilePage extends StatelessWidget {
                             );
                           }
                         } finally {
-                          // 2) Закрываем лоадер ТОЛЬКО если он висит сверху
+
                           final nav = rootNavigatorKey.currentState;
                           if (loaderShown && (nav?.canPop() ?? false)) {
                             nav!.pop();
@@ -203,7 +203,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  // ==== helpers ====
+
 
   static Widget _row(String l, String r) {
     return Padding(

@@ -1,9 +1,9 @@
-// chat_message.dart
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatMessage {
   final String id;
-  final String role; // 'user' | 'assistant'
+  final String role;
   final String text;
   final DateTime? createdAt;
   final String senderId;

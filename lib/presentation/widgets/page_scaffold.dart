@@ -12,11 +12,11 @@ class PageScaffold extends StatelessWidget {
   final PreferredSizeWidget? appBar;
   final Widget? bottomNavigationBar;
 
-  /// Показывать зелёный пузырёк?
+
   final bool showCoachFab;
 
-  /// «Чистая» высота навбара (без safe area снизу).
-  /// Нужна, чтобы поднять FAB ровно на 8dp над верхом бара.
+
+
   final double bottomBarCoreHeight;
 
   const PageScaffold({
@@ -31,7 +31,7 @@ class PageScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final safeBottom = MediaQuery.of(context).padding.bottom;
-    // FAB будет на 8dp выше верхнего края бара: safe + core + 8
+
     final fabBottom = math.max(0.0, safeBottom) + bottomBarCoreHeight + 8.0.h;
 
     return Scaffold(
@@ -41,7 +41,7 @@ class PageScaffold extends StatelessWidget {
         children: [
           Positioned.fill(child: body),
 
-          // Строгое позиционирование справа-снизу
+
           Positioned(
             right: 16.w,
             bottom: fabBottom,

@@ -17,20 +17,16 @@ class AddMatchState with _$AddMatchState {
     @Default(0) int yourGoals,
     @Default(0) int opponentGoals,
 
-    // соперник и логотипы
     String? opponentId,
     String? opponentLogoUrl,
     String? yourLogoUrl,
 
-    // флаги загрузки логотипов
     @Default(false) bool isUploadingYourLogo,
     @Default(false) bool isUploadingOpponentLogo,
 
-    // позицию В МАТЧЕ убрали
     @Default(FieldType.natural) FieldType fieldType,
     @Default(Weather.sunny) Weather weather,
 
-    // личная статистика на карточке
     @Default(0) int myGoals,
     @Default(0) int myAssists,
     @Default(0) int myInterceptions,

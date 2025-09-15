@@ -46,7 +46,7 @@ class AddMatchPage extends StatelessWidget {
           body: ListView(
             padding: EdgeInsets.all(16.w),
             children: [
-              // ====== Дата и длительность ======
+
               MatchSectionCard(
                 title: 'Дата и длительность матча',
                 child: state.date == null
@@ -84,13 +84,13 @@ class AddMatchPage extends StatelessWidget {
               ),
               SizedBox(height: 12.h),
 
-              // ====== Результат матча ======
+
               MatchSectionCard(
                 title: 'Результат матча',
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // кнопка выбора соперника из последних
+
                     Align(
                       alignment: Alignment.center,
                       child: GreenPillButton(
@@ -109,7 +109,7 @@ class AddMatchPage extends StatelessWidget {
 
                     SizedBox(height: 12.h),
 
-                    // --- Команды (как на макете) ---
+
                     TeamsLogosRow(
                       yourLogoUrl: state.yourLogoUrl,
                       opponentLogoUrl: state.opponentLogoUrl,
@@ -121,7 +121,7 @@ class AddMatchPage extends StatelessWidget {
 
                     SizedBox(height: 12.h),
 
-                    // Инпуты названий команд
+
                     TeamInputs(
                       yourTeam: state.yourTeam,
                       opponentTeam: state.opponentTeam,
@@ -165,7 +165,7 @@ class AddMatchPage extends StatelessWidget {
               ),
               SizedBox(height: 12.h),
 
-              // ====== Условия ======
+
               MatchSectionCard(
                 title: 'Условия матча',
                 child: FieldWeatherSegment(
@@ -178,7 +178,7 @@ class AddMatchPage extends StatelessWidget {
 
               SizedBox(height: 20.h),
 
-              // ====== Личная статистика ======
+
               MatchSectionCard(
                 title: 'Ваша статистика в матче',
                 child: MatchPersonalStatsCard(
@@ -216,7 +216,7 @@ class AddMatchPage extends StatelessWidget {
     );
   }
 
-  // ===== helpers =====
+
 
   static String _datePillLabel(BuildContext context, DateTime d) {
     final lang = Localizations.localeOf(context).languageCode;
@@ -271,7 +271,7 @@ class AddMatchPage extends StatelessWidget {
   }
 }
 
-// Серая «таблетка» с зелёным текстом
+
 class _InfoPill extends StatelessWidget {
   final String text;
   const _InfoPill({required this.text});
@@ -298,7 +298,7 @@ class _InfoPill extends StatelessWidget {
   }
 }
 
-// Небольшая зелёная таблетка-кнопка
+
 class GreenPillButton extends StatelessWidget {
   final String text;
   final VoidCallback? onTap;
@@ -328,7 +328,7 @@ class GreenPillButton extends StatelessWidget {
   }
 }
 
-// ---- Pickers ----
+
 Future<(DateTime, int)?> _pickDateDuration(
     BuildContext context, {
       DateTime? initialDate,
@@ -341,7 +341,7 @@ Future<(DateTime, int)?> _pickDateDuration(
   );
 }
 
-/// Заголовок «Команды» + две плитки логотипов
+
 class TeamsLogosRow extends StatelessWidget {
   final String? yourLogoUrl;
   final String? opponentLogoUrl;
@@ -401,7 +401,7 @@ class TeamsLogosRow extends StatelessWidget {
   }
 }
 
-/// Квадратная плитка логотипа 72x72 с “+”
+
 class _LogoTile extends StatelessWidget {
   final String title;
   final String? imageUrl;
@@ -418,7 +418,7 @@ class _LogoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final r = 16.r;
-    final s = 72.w; // размер квадрата
+    final s = 72.w;
 
     Widget square;
     if (imageUrl != null && imageUrl!.isNotEmpty) {

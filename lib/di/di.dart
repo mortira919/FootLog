@@ -71,14 +71,13 @@ import 'package:footlog/presentation/cubit/profile/profile_cubit.dart';
 final getIt = GetIt.instance;
 
 Future<void> initDependencies({bool useMocks = true}) async {
-  // ===== CORE =====
   _lazy<FirebaseAuth>(() => FirebaseAuth.instance);
   _lazy<GoogleSignIn>(() => GoogleSignIn());
   _lazy<FirebaseFirestore>(() => FirebaseFirestore.instance);
   _lazy<FirebaseDatabase>(() => FirebaseDatabase.instance);
   _lazy<FirebaseStorage>(() => FirebaseStorage.instance);
 
-  // ===== AUTH =====
+
   _lazy<AuthRepository>(() => AuthRepositoryImpl(
     getIt<FirebaseAuth>(),
     getIt<GoogleSignIn>(),
@@ -98,7 +97,7 @@ Future<void> initDependencies({bool useMocks = true}) async {
     logoutUseCase: getIt(),
   ));
 
-  // ===== HOME: Profile (для главного экрана) =====
+
   if (useMocks) {
     _lazy<home_profile.ProfileRepository>(() => home_profile_mock.ProfileRepositoryMock());
   } else {
@@ -107,17 +106,17 @@ Future<void> initDependencies({bool useMocks = true}) async {
   _factory(() => GetPlayerProfileUseCase(getIt<home_profile.ProfileRepository>()));
   _factory(() => SavePlayerProfileUseCase(getIt<home_profile.ProfileRepository>()));
 
-  // ===== MATCHES (FS для добавления/редактирования) =====
+
   _lazy<matches_repos.MatchesRepository>(() => MatchesRepositoryImpl(getIt<FirebaseFirestore>()));
   _factory(() => AddMatchUseCase(getIt<matches_repos.MatchesRepository>()));
   _factory(() => UpdateMatchUseCase(getIt<matches_repos.MatchesRepository>()));
   _factory(() => DeleteMatchUseCase(getIt<matches_repos.MatchesRepository>()));
 
-  // ===== HOME: RecentMatches (читает yourLogoUrl + opponentLogoUrl) =====
+
   _lazy<home_repos.MatchesRepository>(() => home_matches_impl.HomeMatchesRepositoryImpl(getIt<FirebaseFirestore>()));
   _factory(() => GetRecentMatchesUseCase(getIt<home_repos.MatchesRepository>()));
 
-  // ===== STATS =====
+
   if (useMocks) {
     _lazy<stats.StatsRepository>(() => stats_mock.StatsRepositoryMock());
   } else {
@@ -130,7 +129,7 @@ Future<void> initDependencies({bool useMocks = true}) async {
     );
   }
 
-  // ===== OPPONENTS (RTDB + Storage) =====
+
   _lazy<IOpponentsRepository>(() => OpponentsRepositoryRtdb(
     getIt<FirebaseDatabase>(),
     getIt<FirebaseStorage>(),
@@ -139,14 +138,14 @@ Future<void> initDependencies({bool useMocks = true}) async {
   _factory(() => UpsertOpponentFromMatchUseCase(getIt<IOpponentsRepository>()));
   _factory(() => UploadOpponentLogoUseCase(getIt<IOpponentsRepository>()));
 
-  // ===== YOUR TEAMS (аналог opponents; хранит лого вашей команды) =====
+
   _lazy<IYourTeamsRepository>(() => YourTeamsRepositoryRtdb(
     getIt<FirebaseDatabase>(),
     getIt<FirebaseStorage>(),
   ));
   _factory(() => UploadYourTeamLogoUseCase(getIt<IYourTeamsRepository>()));
 
-  // ===== WELLBEING =====
+
   _lazy<WellbeingRepository>(() => WellbeingRepositoryImpl(getIt<FirebaseFirestore>()));
   if (!getIt.isRegistered<WellbeingCubit>()) {
     getIt.registerFactoryParam<WellbeingCubit, String, DateTime?>(
@@ -158,7 +157,7 @@ Future<void> initDependencies({bool useMocks = true}) async {
     );
   }
 
-  // ===== PROFILE (экран редактирования профиля) =====
+
   _lazy<edit_profile.ProfileRepository>(() => edit_profile_impl.ProfileRepositoryImpl(getIt<FirebaseFirestore>()));
   if (!getIt.isRegistered<ProfileCubit>()) {
     getIt.registerFactoryParam<ProfileCubit, String, void>(
@@ -170,7 +169,7 @@ Future<void> initDependencies({bool useMocks = true}) async {
   }
 }
 
-// ---- helpers
+
 void _lazy<T extends Object>(T Function() f) {
   if (!getIt.isRegistered<T>()) getIt.registerLazySingleton<T>(f);
 }

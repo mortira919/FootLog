@@ -96,8 +96,8 @@ class _FullProfileSheetState extends State<_FullProfileSheet> {
   late final TextEditingController _weight;
 
   DateTime? _birth;
-  late String _foot;     // 'left' | 'right'
-  late String _position; // 'GK','CB','CM',...
+  late String _foot;
+  late String _position;
 
   @override
   void initState() {

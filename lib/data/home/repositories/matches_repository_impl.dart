@@ -46,7 +46,7 @@ class HomeMatchesRepositoryImpl implements MatchesRepository {
         opponentGoals: _i(m['opponentGoals']),
         outcome: _outcome(m['outcome']),
         opponentLogoUrl: m['opponentLogoUrl'] as String?,
-        yourLogoUrl:     m['yourLogoUrl']     as String?, // <— ВАЖНО
+        yourLogoUrl:     m['yourLogoUrl']     as String?,
       );
     }).toList();
   }

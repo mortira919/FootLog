@@ -5,8 +5,8 @@ class PlayerProfile {
   final DateTime? birthDate;
   final int? heightCm;
   final int? weightKg;
-  final String dominantFoot; // 'right' | 'left'
-  final String position;     // 'GK','CB','LB','RB','CDM','CM','CAM','RW','LW','ST'
+  final String dominantFoot;
+  final String position;
   final String? kitNumber;
   final String? teamName;
 
@@ -55,13 +55,13 @@ class PlayerProfile {
   }..removeWhere((k, v) => v == null);
 
   factory PlayerProfile.fromJson(Map<String, dynamic> j) {
-    // birthDate может быть Timestamp или ISO-строка
+
     DateTime? bdate;
     final raw = j['birthDate'];
     if (raw is Timestamp) bdate = raw.toDate();
     if (raw is String) bdate = DateTime.tryParse(raw);
 
-    // позиция: сначала новое поле, затем fallback на старые
+
     String pos = (j['position'] ?? '') as String;
     if (pos.isEmpty) {
       pos = (j['primaryPosition'] ?? '') as String;
@@ -87,7 +87,7 @@ class PlayerProfile {
   }
 }
 
-// RU-подписи позиций для отображения
+
 const positionLabelsRu = <String, String>{
   'GK': 'Вратарь',
   'CB': 'Центральный защитник',

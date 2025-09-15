@@ -1,17 +1,16 @@
 abstract class StatsRepository {
-  /// Возвращает агрегаты за последние [months] месяцев (включая текущий),
-  /// в хронологическом порядке: самый старый → текущий.
+
   Future<StatsBundle> monthly(String uid, {int months = 6});
 }
 
 class StatsBundle {
-  final List<String> labels;       // ['Янв','Фев',...]
-  final List<int> matches;         // кол-во матчей
-  final List<int> goals;           // мои голы
-  final List<int> assists;         // мои ассисты
-  final List<int> interceptions;   // мои перехваты
-  final List<int> tackles;         // мои отборы
-  final List<int> saves;           // 👈 МОИ СЕЙВЫ
+  final List<String> labels;
+  final List<int> matches;
+  final List<int> goals;
+  final List<int> assists;
+  final List<int> interceptions;
+  final List<int> tackles;
+  final List<int> saves;
 
   StatsBundle({
     required this.labels,

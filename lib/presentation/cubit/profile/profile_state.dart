@@ -20,7 +20,7 @@ class ProfileState {
     bool? loading,
     bool? saving,
     PlayerProfile? data,
-    String? error,            // pass empty string to clear
+    String? error,
   }) {
     return ProfileState(
       loading: loading ?? this.loading,

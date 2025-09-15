@@ -9,11 +9,9 @@ class RecentMatch {
   final int opponentGoals;
   final Outcome outcome;
 
-  /// URL логотипа соперника (может быть null)
   final String? opponentLogoUrl;
 
-  /// URL логотипа вашей команды (может быть null)
-  final String? yourLogoUrl; // 👈 ДОБАВИЛИ
+  final String? yourLogoUrl;
 
   const RecentMatch({
     required this.id,
@@ -24,7 +22,7 @@ class RecentMatch {
     required this.opponentGoals,
     required this.outcome,
     this.opponentLogoUrl,
-    this.yourLogoUrl, // 👈 ДОБАВИЛИ
+    this.yourLogoUrl,
   });
 
   RecentMatch copyWith({
@@ -36,7 +34,7 @@ class RecentMatch {
     int? opponentGoals,
     Outcome? outcome,
     String? opponentLogoUrl,
-    String? yourLogoUrl, // 👈 ДОБАВИЛИ
+    String? yourLogoUrl,
   }) {
     return RecentMatch(
       id: id ?? this.id,
@@ -47,7 +45,7 @@ class RecentMatch {
       opponentGoals: opponentGoals ?? this.opponentGoals,
       outcome: outcome ?? this.outcome,
       opponentLogoUrl: opponentLogoUrl ?? this.opponentLogoUrl,
-      yourLogoUrl: yourLogoUrl ?? this.yourLogoUrl, // 👈 ДОБАВИЛИ
+      yourLogoUrl: yourLogoUrl ?? this.yourLogoUrl,
     );
   }
 }

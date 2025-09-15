@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:footlog/domain/stats/repositories/stats_repository.dart'; // для StatsBundle
+import 'package:footlog/domain/stats/repositories/stats_repository.dart';
 
 part 'stats_state.freezed.dart';
 

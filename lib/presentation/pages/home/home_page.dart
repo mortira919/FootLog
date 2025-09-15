@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _onTabChanged(int i) async {
-    // центральная кнопка "Добавить матч"
+
     if (i == 2) {
       final saved = await context.push<bool>(RouteNames.matchesAdd);
       if (!mounted) return;

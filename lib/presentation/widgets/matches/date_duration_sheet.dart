@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/app_theme.dart';
 
-/// Модалка выбора (дата начала + длительность), возвращает (DateTime, minutes) или null
+
 Future<(DateTime, int)?> showDateDurationSheet(
     BuildContext context, {
       DateTime? initialDate,

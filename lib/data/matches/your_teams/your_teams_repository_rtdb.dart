@@ -27,7 +27,6 @@ class YourTeamsRepositoryRtdb implements IYourTeamsRepository {
           list.add(YourTeam.fromMap(id, v.cast<String, dynamic>()));
         }
       });
-      // limitToLast отдаёт по возрастанию — разворачиваем по убыванию
       list.sort((a, b) {
         final at = a.lastPlayedAt?.millisecondsSinceEpoch ?? 0;
         final bt = b.lastPlayedAt?.millisecondsSinceEpoch ?? 0;

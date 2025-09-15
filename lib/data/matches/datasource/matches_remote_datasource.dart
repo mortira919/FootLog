@@ -1,10 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../dto/match_dto.dart';
 
-/// Контракт удалённого источника (только Firestore, без маппинга в Domain)
+
 abstract class MatchesRemoteDataSource {
   Future<String> add(String uid, MatchDto dto);
-  Future<void> update(String uid, MatchDto dto); // dto.id обязателен
+  Future<void> update(String uid, MatchDto dto);
   Future<void> delete(String uid, String matchId);
   Future<List<MatchDto>> getRecent(String uid, {int limit = 5});
 }

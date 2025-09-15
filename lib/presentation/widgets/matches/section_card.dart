@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/app_theme.dart';
 
-/// Белая карточка секции (радиус 16, мягкая тень), заголовок по центру.
+
 class MatchSectionCard extends StatelessWidget {
   final String title;
   final Widget child;
@@ -42,7 +42,7 @@ class MatchSectionCard extends StatelessWidget {
   }
 }
 
-/// Зелёная «пилюля» (фон светло-зелёный, текст — primary).
+
 class GreenPillButton extends StatelessWidget {
   final String text;
   final VoidCallback? onTap;

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/app_theme.dart';
 
-/// Ряд: метка слева, число справа, затем компактный степпер (- | +) 94x32.
+
 class ScoreRowFigma extends StatelessWidget {
   final String label;
   final int value;
@@ -33,7 +33,6 @@ class ScoreRowFigma extends StatelessWidget {
   }
 }
 
-/// Компактный степпер (- | +) — 94w x 32h, радиус 8, фон Fills/Tertiary.
 class _MiniStepper extends StatelessWidget {
   final VoidCallback onMinus;
   final VoidCallback onPlus;
@@ -53,7 +52,7 @@ class _MiniStepper extends StatelessWidget {
     const Color trackBg = Color(0xFFF2F3F5);
     const Color divider = Color(0xFFD7D9DE);
 
-    // аккуратно делим ширину пополам с учётом 1px разделителя
+
     const double dividerW = 1.0; // 1 logical px
     final double leftW = _snap(context, (w - dividerW) / 2);
     final double rightW = w - dividerW - leftW;

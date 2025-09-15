@@ -94,7 +94,7 @@ class _CoachChatPageState extends State<CoachChatPage> {
                         uid: uid,
                         text: text,
                       );
-                      // ответ придёт автоматом от Функции
+
                     },
                   )
                 ],

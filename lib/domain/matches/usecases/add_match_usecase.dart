@@ -9,7 +9,7 @@ class AddMatchUseCase {
 
   Future<MyResult<String>> call(String uid, MatchItem m) async {
     try {
-      // простая валидация
+
       if (m.durationMin < 10 || m.durationMin > 180) {
         return const Error('Длительность должна быть 10–180 мин');
       }
@@ -17,7 +17,7 @@ class AddMatchUseCase {
         return const Error('Голы не могут быть отрицательными');
       }
 
-      // гарантируем корректный outcome из счёта
+
       final Outcome out = m.yourGoals == m.opponentGoals
           ? Outcome.draw
           : (m.yourGoals > m.opponentGoals ? Outcome.win : Outcome.loss);

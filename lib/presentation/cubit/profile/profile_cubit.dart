@@ -30,7 +30,7 @@ class ProfileCubit extends Cubit<ProfileState> {
     }
   }
 
-  // ===== setters =====
+
   void updateName(String v) =>
       emit(state.copyWith(data: state.data.copyWith(name: v)));
 

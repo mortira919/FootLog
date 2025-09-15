@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:footlog/domain/wellbeing/entities/wellbeing_entry.dart';
-// Берём Mood и Quality3 из домена, не дублируем!
 
 class WellbeingState extends Equatable {
   final DateTime date;
@@ -48,7 +47,7 @@ class WellbeingState extends Equatable {
     bool? discomfort,
     bool? injury,
     bool? saving,
-    String? error, // чтобы очистить — передай null явно
+    String? error,
   }) {
     return WellbeingState(
       date: date ?? this.date,

@@ -13,7 +13,7 @@ class CoachChatFabButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = 50.0.w; // адаптивный диаметр пузырька
+    final size = 50.0.w;
 
     return IgnorePointer(
       ignoring: !visible,

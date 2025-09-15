@@ -33,7 +33,7 @@ class Routes {
 final GlobalKey<NavigatorState> rootNavigatorKey  = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> shellNavigatorKey = GlobalKey<NavigatorState>();
 
-/// Обёртка над stream → ChangeNotifier (для refreshListenable)
+
 class GoRouterRefreshStream extends ChangeNotifier {
   late final StreamSubscription<dynamic> _sub;
   GoRouterRefreshStream(Stream<dynamic> stream) {
@@ -46,7 +46,7 @@ class GoRouterRefreshStream extends ChangeNotifier {
   }
 }
 
-/// Фабрика роутера — вызывать ПОСЛЕ initDependencies()
+
 GoRouter createAppRouter() {
   final auth = GetIt.I<FirebaseAuth>();
   final refresh = GoRouterRefreshStream(auth.authStateChanges());
@@ -54,7 +54,7 @@ GoRouter createAppRouter() {
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: Routes.login,
-    debugLogDiagnostics: kDebugMode, // полезные логи навигации
+    debugLogDiagnostics: kDebugMode,
     refreshListenable: refresh,
     redirect: (context, state) {
       final loggedIn = auth.currentUser != null;

@@ -10,16 +10,16 @@ import 'di/di.dart';
 import 'presentation/cubit/auth/auth_cubit.dart';
 import 'presentation/navigation/app_router.dart';
 
-late final GoRouter _router; // создадим после DI
+late final GoRouter _router;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // регистрируем зависимости
+
   await initDependencies(useMocks: false);
 
-  // теперь, когда DI инициализирован, создаём роутер
+
   _router = createAppRouter();
 
   runApp(const FootLogApp());

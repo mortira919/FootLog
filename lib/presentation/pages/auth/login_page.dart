@@ -7,7 +7,7 @@ import '../../../core/app_theme.dart';
 import '../../cubit/auth/auth_cubit.dart';
 import '../../cubit/auth/auth_state.dart';
 import '../../widgets/common_form_fields.dart'; // AppTextField, PasswordField, GoogleButton, DividerWithLabel
-import '../../navigation/app_router.dart';      // Routes
+import '../../navigation/app_router.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -42,10 +42,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ===== адаптация по макету =====
+
     const designBlockHeight = 460.0;
     final safeTop  = MediaQuery.of(context).padding.top;
-    final topTitle = 102.h; // отступ до заголовка по макету
+    final topTitle = 102.h;
 
     final available = MediaQuery.of(context).size.height - safeTop - topTitle;
     final factor = (available / designBlockHeight.h).clamp(0.85, 1.0);
@@ -54,9 +54,9 @@ class _LoginPageState extends State<LoginPage> {
     final titleStyle =
     factor < 0.95 ? AppText.h1.copyWith(fontSize: 30.sp) : AppText.h1;
 
-    // ===== локальная тема для полей и кнопок =====
+
     final localTheme = Theme.of(context).copyWith(
-      // убираем Underline у TextField и задаём заливку
+
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
@@ -78,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
           borderSide: const BorderSide(color: Color(0xFFFF3B30), width: 1),
         ),
       ),
-      // глобально убираем серый overlay у TextButton
+
       textButtonTheme: const TextButtonThemeData(
         style: ButtonStyle(
           overlayColor: MaterialStatePropertyAll(Colors.transparent),
@@ -112,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
             final content = Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Заголовок
+
                 Padding(
                   padding: EdgeInsets.only(
                     top: safeTop + topTitle,
@@ -134,7 +134,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 SizedBox(height: 16.h),
 
-                // Поля и кнопки
+
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
                   child: Column(
@@ -153,7 +153,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       SizedBox(height: 8.h),
 
-                      // Забыли пароль?
+
                       Align(
                         alignment: Alignment.centerLeft,
                         child: TextButton(
@@ -209,7 +209,7 @@ class _LoginPageState extends State<LoginPage> {
 
                       SizedBox(height: vh(16)),
 
-                      // «Ещё нет аккаунта? Создать»
+
                       Center(
                         child: TextButton(
                           onPressed: () => context.go(Routes.register),

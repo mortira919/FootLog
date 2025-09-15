@@ -52,7 +52,7 @@ class HomeBottomNav extends StatelessWidget {
               selectedIndex: index,
               height: 64,
               onDestinationSelected: (i) {
-                // Профиль: открываем просмотр профиля поверх текущего стека.
+
                 onChanged?.call(i);
               },
               destinations: const [

@@ -15,7 +15,7 @@ class OpponentsRepositoryRtdb implements IOpponentsRepository {
 
   @override
   Future<List<Opponent>> getRecent(String uid, {int limit = 20}) async {
-    // сортировка по последней дате и/или количеству — зависит от твоих данных
+
     final snap = await db.ref('users/$uid/opponents')
         .orderByChild('lastPlayedAt')
         .limitToLast(limit)
@@ -29,7 +29,7 @@ class OpponentsRepositoryRtdb implements IOpponentsRepository {
       list.add(Opponent.fromMap(c.key!, data));
     }
 
-    // limitToLast даёт по возрастанию — развернём по убыванию
+
     list.sort((a, b) => (b.lastPlayedAt ?? DateTime(0))
         .compareTo(a.lastPlayedAt ?? DateTime(0)));
     return list;
@@ -54,7 +54,7 @@ class OpponentsRepositoryRtdb implements IOpponentsRepository {
     final ref = _opRef(uid, id);
     final now = playedAt ?? DateTime.now();
 
-    // читаем текущее, чтобы нарастить matchesCount
+
     final snap = await ref.get();
     int current = 0;
     if (snap.exists) {
@@ -78,7 +78,7 @@ class OpponentsRepositoryRtdb implements IOpponentsRepository {
         required List<int> bytes,
         String contentType = 'image/jpeg',
       }) async {
-    // Определим расширение в зависимости от contentType
+
     final isPng = contentType.toLowerCase().contains('png');
     final ext = isPng ? 'png' : 'jpg';
 
@@ -91,7 +91,7 @@ class OpponentsRepositoryRtdb implements IOpponentsRepository {
 
     final url = await ref.getDownloadURL();
 
-    // Не обязательно, но удобно сразу обновить RTDB, чтобы «последние» увидели картинку
+
     await _opRef(uid, opponentId).update({'logoUrl': url});
 
     return url;

@@ -10,6 +10,6 @@ class RouteNames {
   static const home = 'home';
   static const matchesAdd = '/matches/add';
   static const profile      = '/profile';
-  static const profileEdit = '/profile/edit'; // 👈 добавили
+  static const profileEdit = '/profile/edit';
 
 }

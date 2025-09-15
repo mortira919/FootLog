@@ -1,4 +1,3 @@
-// lib/presentation/widgets/matches/team_inputs.dart
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -75,7 +74,7 @@ class _TeamInputsState extends State<TeamInputs> {
       fontSize: 17.sp, fontWeight: FontWeight.w400, height: 1.0, color: AppColors.black,
     );
 
-    final contentW = MediaQuery.of(context).size.width - 32.w; // padding карточки 16+16
+    final contentW = MediaQuery.of(context).size.width - 32.w;
     final maxTextW = math.max(
       _measure(context, 'Ваша', labelStyleForMeasure),
       _measure(context, 'Соперника', labelStyleForMeasure),
@@ -93,7 +92,7 @@ class _TeamInputsState extends State<TeamInputs> {
           labelColumnWidth: labelColumnWidth,
           textInputAction: TextInputAction.next,
           hairline: hairline,
-          bottomInset: 12.h, // расстояние от текста до линии
+          bottomInset: 12.h,
         ),
         SizedBox(height: 10.h),
         _InlineLinedFieldCtrl(
@@ -143,17 +142,16 @@ class _InlineLinedFieldCtrl extends StatelessWidget {
     final double gap = 6.w;
 
     return SizedBox(
-      height: 56.h, // больше «воздуха», как в макете
+      height: 56.h,
       child: Stack(
         children: [
-          // разделительная линия (1px)
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: Container(height: hairline, color: const Color(0x4A3C3C43)),
           ),
-          // контент с отступом от линии
+
           Padding(
             padding: EdgeInsets.only(bottom: bottomInset),
             child: Row(

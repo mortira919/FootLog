@@ -18,19 +18,14 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   @override
   Future<void> saveProfile(String uid, PlayerProfile p) async {
-    // Готовим основную «новую» схему
     final data = p.toJson();
 
-    // Совместимость со старым Home (ничего не ломаем):
-    // - пишем primaryPosition
-    // - в positions гарантируем наличие текущей позиции
+
     data['primaryPosition'] = p.position;
     data['positions'] = FieldValue.arrayUnion([p.position]);
 
-    // Служебное поле
     data['updatedAt'] = FieldValue.serverTimestamp();
 
-    // merge: частичное обновление без затирания
     await _doc(uid).set(data, SetOptions(merge: true));
   }
 }

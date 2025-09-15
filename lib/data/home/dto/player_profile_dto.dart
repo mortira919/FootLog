@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PlayerProfileDto {
   final String name;
-  final String primaryPosition; // 'ST', 'RW' и т.д.
-  final List<String> positions; // ['ST','RW','LW']
+  final String primaryPosition;
+  final List<String> positions;
   final Timestamp? updatedAt;
 
   PlayerProfileDto({

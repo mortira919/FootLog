@@ -11,7 +11,7 @@ class StatsRepositoryMock implements StatsRepository {
     final assists = <int>[];
     final interceptions = <int>[];
     final tackles = <int>[];
-    final saves = <int>[]; // 👈
+    final saves = <int>[];
 
     final base = [10, 5, 8, 6, 7, 9, 4, 11, 3, 12, 2, 13];
     for (int i = 0; i < months; i++) {
@@ -22,7 +22,7 @@ class StatsRepositoryMock implements StatsRepository {
       assists.add((v * 0.33).round());
       interceptions.add((v * 0.25).round());
       tackles.add((v * 0.2).round());
-      saves.add((v * 0.18).round()); // 👈 просто тестовые
+      saves.add((v * 0.18).round());
     }
 
     return StatsBundle(
@@ -32,7 +32,7 @@ class StatsRepositoryMock implements StatsRepository {
       assists: assists,
       interceptions: interceptions,
       tackles: tackles,
-      saves: saves, // 👈
+      saves: saves,
     );
   }
 }

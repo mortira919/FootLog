@@ -17,7 +17,7 @@ class MatchesRepositoryImpl implements MatchesRepository {
   CollectionReference<Map<String, dynamic>> _col(String uid) =>
       db.collection('users').doc(uid).collection('matches');
 
-  // ---------- enum mappers ----------
+
   String _fieldToStr(FieldType f) => f.name;
   FieldType _fieldFrom(String s) =>
       FieldType.values.firstWhere((e) => e.name == s, orElse: () => FieldType.natural);
@@ -30,7 +30,7 @@ class MatchesRepositoryImpl implements MatchesRepository {
   Outcome _outcomeFrom(String s) =>
       Outcome.values.firstWhere((e) => e.name == s, orElse: () => Outcome.draw);
 
-  // ---------- domain <-> dto ----------
+
   MatchDto _toDto(MatchItem m) => MatchDto(
     id: m.id,
     date: Timestamp.fromDate(m.date),
@@ -42,7 +42,6 @@ class MatchesRepositoryImpl implements MatchesRepository {
     fieldType: _fieldToStr(m.fieldType),
     weather: _weatherToStr(m.weather),
     outcome: _outcomeToStr(m.outcome),
-    // 👇 ДОБАВИЛИ yourLogoUrl
     yourLogoUrl: m.yourLogoUrl,
     opponentLogoUrl: m.opponentLogoUrl,
     myGoals: m.myGoals ?? 0,
@@ -63,7 +62,6 @@ class MatchesRepositoryImpl implements MatchesRepository {
     fieldType: _fieldFrom(d.fieldType),
     weather: _weatherFrom(d.weather),
     outcome: _outcomeFrom(d.outcome),
-    // 👇 ПРОКИДЫВАЕМ ОБА URL
     yourLogoUrl: d.yourLogoUrl,
     opponentLogoUrl: d.opponentLogoUrl,
     myGoals: d.myGoals,
@@ -73,7 +71,7 @@ class MatchesRepositoryImpl implements MatchesRepository {
     mySaves: d.mySaves,
   );
 
-  // ========== Write ==========
+
   @override
   Future<String> addMatch(String uid, MatchItem m) async {
     final dto = _toDto(m);
@@ -93,7 +91,7 @@ class MatchesRepositoryImpl implements MatchesRepository {
     return _col(uid).doc(matchId).delete();
   }
 
-  // ========== Read ==========
+
   @override
   Future<List<RecentMatch>> getRecentMatches(String uid, {int limit = 5}) async {
     final snap = await _col(uid).orderBy('date', descending: true).limit(limit).get();
@@ -113,7 +111,6 @@ class MatchesRepositoryImpl implements MatchesRepository {
         yourGoals: you,
         opponentGoals: opp,
         outcome: out,
-        // 👇 читаем оба
         yourLogoUrl: dto.yourLogoUrl,
         opponentLogoUrl: dto.opponentLogoUrl,
       );

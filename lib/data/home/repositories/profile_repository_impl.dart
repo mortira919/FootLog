@@ -14,7 +14,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
   DocumentReference<Map<String, dynamic>> _doc(String uid) =>
       _collection(uid).doc('main');
 
-  // -- mapping helpers
+
   Position _fromString(String s) {
     return Position.values.firstWhere(
           (p) => p.name.toUpperCase() == s.toUpperCase(),
@@ -29,15 +29,13 @@ class ProfileRepositoryImpl implements ProfileRepository {
     final snap = await _doc(uid).get();
     final data = snap.data();
 
-    // Если профиля ещё нет — создаём дефолт СРАЗУ в обоих форматах
+
     if (data == null) {
       final pos = 'ST';
       await _doc(uid).set({
         'name': 'Имя Фамилия',
-        // старый формат для Home:
         'primaryPosition': pos,
         'positions': [pos],
-        // новое поле, которое пишет экран редактирования:
         'position': pos,
         'updatedAt': FieldValue.serverTimestamp(),
       });
@@ -48,12 +46,10 @@ class ProfileRepositoryImpl implements ProfileRepository {
       );
     }
 
-    // --- ЧТЕНИЕ С УЧЁТОМ ОБОИХ ФОРМАТОВ ---
+
     final name = (data['name'] ?? 'Имя Фамилия') as String;
 
-    // 1) новое поле 'position' (от экрана редактирования)
-    // 2) старое поле 'primaryPosition'
-    // 3) первый элемент из массива 'positions'
+
     var posStr = (data['position'] ?? data['primaryPosition'] ?? '') as String;
     if (posStr.isEmpty) {
       final arr = data['positions'];
@@ -78,13 +74,13 @@ class ProfileRepositoryImpl implements ProfileRepository {
     final primary = _toString(profile.primaryPosition);
     final list = profile.positions.map(_toString).toList();
 
-    // Пишем и старые, и новые поля, чтобы оба экрана были счастливы.
+
     await _doc(uid).set({
       'name': profile.name,
-      // старый формат, который уже использует Home:
+
       'primaryPosition': primary,
       'positions': list,
-      // новое поле, которое использует экран редактирования:
+
       'position': primary,
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));

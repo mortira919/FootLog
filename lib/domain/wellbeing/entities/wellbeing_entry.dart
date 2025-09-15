@@ -1,25 +1,23 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// Настроения (до/после)
 enum Mood { bad, neutral, good, veryGood }
 
-/// Качество по шкале 3-х уровней
 enum Quality3 { bad, normal, good }
 
 class WellbeingEntry {
-  final DateTime date;                // Дата (без времени)
+  final DateTime date;
   final Mood moodBefore;
   final Mood moodAfter;
-  final int energy;                   // 0..10
+  final int energy;
 
-  final int sleepMinutes;             // сколько спал, в минутах
-  final Quality3 sleepQuality;        // качество сна
+  final int sleepMinutes;
+  final Quality3 sleepQuality;
 
-  final int mealDelayMinutes;         // за сколько минут до матча ел
-  final Quality3 nutritionQuality;    // качество питания
+  final int mealDelayMinutes;
+  final Quality3 nutritionQuality;
 
-  final bool discomfort;              // дискомфорт
-  final bool injury;                  // травма
+  final bool discomfort;
+  final bool injury;
 
   WellbeingEntry({
     required this.date,
@@ -34,10 +32,10 @@ class WellbeingEntry {
     required this.injury,
   });
 
-  /// Используем только дату (обрезаем время)
+
   static DateTime onlyDate(DateTime d) => DateTime(d.year, d.month, d.day);
 
-  /// Док-id формата YYYY-MM-DD
+
   static String docId(DateTime d) {
     final dd = onlyDate(d);
     final m = dd.month.toString().padLeft(2, '0');

@@ -30,7 +30,6 @@ class AddMatchCubit extends Cubit<AddMatchState> {
   int _clamp(int v, {int min = 0, int max = 999}) =>
       v < min ? min : (v > max ? max : v);
 
-  // ---------- setters ----------
   void setDateDuration(DateTime date, int durationMin) =>
       emit(state.copyWith(date: date, durationMin: durationMin));
 
@@ -63,7 +62,6 @@ class AddMatchCubit extends Cubit<AddMatchState> {
     ),
   );
 
-  // ---------- личная статистика ----------
   void setPersonalStats({
     int? goals,
     int? assists,
@@ -80,7 +78,6 @@ class AddMatchCubit extends Cubit<AddMatchState> {
     ));
   }
 
-  // ---------- загрузка логотипов ----------
   Future<void> pickAndUploadOpponentLogo() async {
     if (state.isUploadingOpponentLogo) return;
     try {
@@ -152,7 +149,6 @@ class AddMatchCubit extends Cubit<AddMatchState> {
     }
   }
 
-  // ---------- submit ----------
   Future<MyResult<String>> submit() async {
     if (state.date == null) {
       const msg = 'Укажи дату';

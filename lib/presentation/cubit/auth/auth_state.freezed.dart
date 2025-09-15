@@ -5,16 +5,13 @@
 
 part of 'auth_state.dart';
 
-// **************************************************************************
-// FreezedGenerator
-// **************************************************************************
+
 
 T _$identity<T>(T value) => value;
 
 final _privateConstructorUsedError = UnsupportedError(
     'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
-/// @nodoc
 mixin _$AuthState {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
@@ -80,13 +77,13 @@ mixin _$AuthState {
       throw _privateConstructorUsedError;
 }
 
-/// @nodoc
+
 abstract class $AuthStateCopyWith<$Res> {
   factory $AuthStateCopyWith(AuthState value, $Res Function(AuthState) then) =
       _$AuthStateCopyWithImpl<$Res, AuthState>;
 }
 
-/// @nodoc
+
 class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
     implements $AuthStateCopyWith<$Res> {
   _$AuthStateCopyWithImpl(this._value, this._then);
@@ -96,18 +93,18 @@ class _$AuthStateCopyWithImpl<$Res, $Val extends AuthState>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
-  /// Create a copy of AuthState
-  /// with the given fields replaced by the non-null parameter values.
+
+
 }
 
-/// @nodoc
+
 abstract class _$$InitialImplCopyWith<$Res> {
   factory _$$InitialImplCopyWith(
           _$InitialImpl value, $Res Function(_$InitialImpl) then) =
       __$$InitialImplCopyWithImpl<$Res>;
 }
 
-/// @nodoc
+
 class __$$InitialImplCopyWithImpl<$Res>
     extends _$AuthStateCopyWithImpl<$Res, _$InitialImpl>
     implements _$$InitialImplCopyWith<$Res> {
@@ -115,11 +112,11 @@ class __$$InitialImplCopyWithImpl<$Res>
       _$InitialImpl _value, $Res Function(_$InitialImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of AuthState
-  /// with the given fields replaced by the non-null parameter values.
+
+
 }
 
-/// @nodoc
+
 
 class _$InitialImpl implements _Initial {
   const _$InitialImpl();
@@ -229,14 +226,14 @@ abstract class _Initial implements AuthState {
   const factory _Initial() = _$InitialImpl;
 }
 
-/// @nodoc
+
 abstract class _$$LoadingImplCopyWith<$Res> {
   factory _$$LoadingImplCopyWith(
           _$LoadingImpl value, $Res Function(_$LoadingImpl) then) =
       __$$LoadingImplCopyWithImpl<$Res>;
 }
 
-/// @nodoc
+
 class __$$LoadingImplCopyWithImpl<$Res>
     extends _$AuthStateCopyWithImpl<$Res, _$LoadingImpl>
     implements _$$LoadingImplCopyWith<$Res> {
@@ -244,11 +241,11 @@ class __$$LoadingImplCopyWithImpl<$Res>
       _$LoadingImpl _value, $Res Function(_$LoadingImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of AuthState
-  /// with the given fields replaced by the non-null parameter values.
+
+
 }
 
-/// @nodoc
+
 
 class _$LoadingImpl implements _Loading {
   const _$LoadingImpl();
@@ -358,7 +355,7 @@ abstract class _Loading implements AuthState {
   const factory _Loading() = _$LoadingImpl;
 }
 
-/// @nodoc
+
 abstract class _$$AuthenticatedImplCopyWith<$Res> {
   factory _$$AuthenticatedImplCopyWith(
           _$AuthenticatedImpl value, $Res Function(_$AuthenticatedImpl) then) =
@@ -367,7 +364,7 @@ abstract class _$$AuthenticatedImplCopyWith<$Res> {
   $Res call({UserEntity user});
 }
 
-/// @nodoc
+
 class __$$AuthenticatedImplCopyWithImpl<$Res>
     extends _$AuthStateCopyWithImpl<$Res, _$AuthenticatedImpl>
     implements _$$AuthenticatedImplCopyWith<$Res> {
@@ -375,8 +372,8 @@ class __$$AuthenticatedImplCopyWithImpl<$Res>
       _$AuthenticatedImpl _value, $Res Function(_$AuthenticatedImpl) _then)
       : super(_value, _then);
 
-  /// Create a copy of AuthState
-  /// with the given fields replaced by the non-null parameter values.
+
+
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -391,7 +388,7 @@ class __$$AuthenticatedImplCopyWithImpl<$Res>
   }
 }
 
-/// @nodoc
+
 
 class _$AuthenticatedImpl implements _Authenticated {
   const _$AuthenticatedImpl(this.user);
@@ -415,8 +412,8 @@ class _$AuthenticatedImpl implements _Authenticated {
   @override
   int get hashCode => Object.hash(runtimeType, user);
 
-  /// Create a copy of AuthState
-  /// with the given fields replaced by the non-null parameter values.
+
+
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')

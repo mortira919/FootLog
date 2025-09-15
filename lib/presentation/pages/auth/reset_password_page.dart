@@ -26,10 +26,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   }
 
   void _onSend(BuildContext context) {
-    FocusScope.of(context).unfocus(); // спрятать клавиатуру
+    FocusScope.of(context).unfocus();
     final email = _emailC.text.trim();
 
-    // простая валидация email
+
     final emailOk = RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(email);
     if (!emailOk) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -43,11 +43,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    // размеры как на других экранах
+
     const designBlockHeight = 258.0;
     final safeTop = MediaQuery.of(context).padding.top;
 
-    // отступ до заголовка по макету
+
     final topTitle = 102.h;
 
     final available = MediaQuery.of(context).size.height - safeTop - topTitle;
@@ -81,7 +81,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           final content = Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Заголовок: по бокам 82.5 как в макете
+
               Padding(
                 padding: EdgeInsets.only(
                   top: safeTop + topTitle,
@@ -102,7 +102,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
               SizedBox(height: 12.h),
 
-              // Контент-блок: по 16
+
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Column(

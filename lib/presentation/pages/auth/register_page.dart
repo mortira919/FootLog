@@ -1,4 +1,3 @@
-  // lib/presentation/pages/register_page.dart
   import 'package:go_router/go_router.dart';
   import '../../navigation/app_router.dart'; // где лежит Routes
   import 'package:flutter/material.dart';
@@ -61,15 +60,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    // параметры из макета
-    const designBlockHeight = 540.0; // высота контент-блока (от полей до низа)
+    const designBlockHeight = 540.0;
     final safeTop = MediaQuery.of(context).padding.top;
-    final topTitle = 102.h; // отступ заголовка сверху
+    final topTitle = 102.h;
 
-    // доступная высота под блок (без заголовка)
+
     final available = MediaQuery.of(context).size.height - safeTop - topTitle;
 
-    // коэффициент сжатия вертикалей на маленьких экранах
+
     final factor = (available / designBlockHeight.h).clamp(0.85, 1.0);
     double vh(double v) => (v.h * factor);
 
@@ -94,18 +92,18 @@ class _RegisterPageState extends State<RegisterPage> {
           final loading =
           state.maybeWhen(loading: () => true, orElse: () => false);
 
-          // сам контент (без скролла)
+
           final content = Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // заголовок — по бокам 36
+
               Padding(
                 padding: EdgeInsets.only(
                   top: safeTop + topTitle,
                   left: 36.w,
                   right: 36.w,
                 ),
-                child: FittedBox( // гарантирует одну строку: подожмёт шрифт, чтобы влезло
+                child: FittedBox(
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -117,10 +115,10 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
                 ),
               ),
-// по макету: от заголовка до поля "Имя" — 16
+
               SizedBox(height: 16.h),
 
-              // блок полей — по бокам 16
+
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16.w),
                 child: Column(
@@ -217,13 +215,13 @@ class _RegisterPageState extends State<RegisterPage> {
             ],
           );
 
-          // обёртка, гарантирующая отсутствие overflow
+
           return SafeArea(
             top: false,
             child: LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
-                  // если помещается — скролла не будет (physics отключит прокрутку)
+
                   physics: constraints.maxHeight >
                       (safeTop + topTitle + designBlockHeight.h * 0.95)
                       ? const NeverScrollableScrollPhysics()

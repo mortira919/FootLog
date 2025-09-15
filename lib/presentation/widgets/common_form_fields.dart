@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../core/app_theme.dart';
 
-/// ─────────────────────────────────────────────────────────────────────────
-///  ТЕКСТОВОЕ ПОЛЕ
-/// ─────────────────────────────────────────────────────────────────────────
+
+
+
 class AppTextField extends StatelessWidget {
   final TextEditingController? controller;
   final String hint;
@@ -25,7 +25,7 @@ class AppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // мягкая тень как в макете
+
     return DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(AppDims.r12()),
@@ -51,9 +51,9 @@ class AppTextField extends StatelessWidget {
   }
 }
 
-/// ─────────────────────────────────────────────────────────────────────────
-///  ПОЛЕ ПАРОЛЯ С ГЛАЗИКОМ
-/// ─────────────────────────────────────────────────────────────────────────
+
+
+
 class PasswordField extends StatefulWidget {
   final TextEditingController? controller;
   final String hint;
@@ -121,9 +121,9 @@ class _PasswordFieldState extends State<PasswordField> {
   }
 }
 
-/// ─────────────────────────────────────────────────────────────────────────
-///  ОСНОВНАЯ ЗЕЛЁНАЯ КНОПКА
-/// ─────────────────────────────────────────────────────────────────────────
+
+
+
 class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -146,9 +146,9 @@ class PrimaryButton extends StatelessWidget {
   }
 }
 
-/// ─────────────────────────────────────────────────────────────────────────
-///  РАЗДЕЛИТЕЛЬ С НАДПИСЬЮ "ИЛИ"
-/// ─────────────────────────────────────────────────────────────────────────
+
+
+
 class DividerWithLabel extends StatelessWidget {
   final String text;
   const DividerWithLabel(this.text, {super.key});
@@ -171,13 +171,13 @@ class DividerWithLabel extends StatelessWidget {
   }
 }
 
-/// ─────────────────────────────────────────────────────────────────────────
-///  КНОПКА GOOGLE
-/// ─────────────────────────────────────────────────────────────────────────
+
+
+
 class GoogleButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
-  final Widget? icon; // можно пробросить Image.asset('assets/google.png')
+  final Widget? icon;
 
   const GoogleButton({
     super.key,
@@ -192,7 +192,7 @@ class GoogleButton extends StatelessWidget {
       height: AppDims.h52(),
       child: OutlinedButton.icon(
         onPressed: onPressed,
-        icon: icon ?? const Icon(Icons.g_mobiledata), // заменишь на свой логотип при желании
+        icon: icon ?? const Icon(Icons.g_mobiledata),
         label: Text(label),
       ),
     );

@@ -2,15 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-/// Инлайн-пикер «часы + минуты» (hm) с кнопкой снизу.
-/// После подтверждения — блокируется до нажатия «Изменить».
+
 class MealDelayPicker extends StatefulWidget {
-  final int initialMinutes;          // старт в минутах
-  final ValueChanged<int> onConfirm; // колбэк по кнопке «Выбрать»
-  final int maxHours;                // кламп по максимальным часам
-  final int minuteStep;              // шаг минут: 1/5/10/15/30
-  final String hoursWord;            // подпись для часов
-  final String minutesWord;          // подпись для минут
+  final int initialMinutes;
+  final ValueChanged<int> onConfirm;
+  final int maxHours;
+  final int minuteStep;
+  final String hoursWord;
+  final String minutesWord;
 
   const MealDelayPicker({
     super.key,
@@ -28,7 +27,7 @@ class MealDelayPicker extends StatefulWidget {
 
 class _MealDelayPickerState extends State<MealDelayPicker> {
   late Duration _duration;
-  bool _locked = false; // блокировка колёс после подтверждения
+  bool _locked = false;
 
   @override
   void initState() {
@@ -56,7 +55,7 @@ class _MealDelayPickerState extends State<MealDelayPicker> {
             height: 170.h,
             child: Stack(
               children: [
-                // блокируем скролл через IgnorePointer
+
                 Positioned.fill(
                   child: IgnorePointer(
                     ignoring: _locked,
@@ -69,7 +68,7 @@ class _MealDelayPickerState extends State<MealDelayPicker> {
                     ),
                   ),
                 ),
-                // лёгкое «задимление» при блокировке
+
                 if (_locked)
                   Positioned.fill(
                     child: IgnorePointer(
@@ -121,7 +120,7 @@ class _MealDelayPickerState extends State<MealDelayPicker> {
   }
 }
 
-/// Делегат локализаций: меняет подписи единиц в CupertinoTimerPicker.
+
 class _TimerUnitsCupertinoDelegate
     extends LocalizationsDelegate<CupertinoLocalizations> {
   final String hoursWord;
@@ -148,7 +147,6 @@ class _TimerUnitsCupertinoDelegate
       old.hoursWord != hoursWord || old.minutesWord != minutesWord;
 }
 
-/// Базируемся на стандартных локализациях, переопределяем подписи таймера.
 class _TimerUnitsCupertinoLocalizations extends DefaultCupertinoLocalizations {
   final String hoursWord;
   final String minutesWord;
